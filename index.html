@@ -1,0 +1,678 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#7357ce"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png"><title>Jelly Jump — WILD BLOOM ✦ Ultimate Nature</title><style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;font-family:system-ui,-apple-system,sans-serif;background:#9bdcf4}canvas{display:block;width:100%;height:100%}#hud{position:absolute;top:calc(env(safe-area-inset-top) + 8px);left:0;right:0;text-align:center;color:white;font-size:42px;font-weight:900;text-shadow:0 3px 6px #4d3a86;pointer-events:none}#level{font-size:13px;letter-spacing:1px}#sound{position:absolute;right:14px;top:calc(env(safe-area-inset-top) + 14px);font-size:23px;background:#ffffffc9;border:0;padding:9px;border-radius:50%;z-index:3}#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#27185a80;color:white;text-align:center;padding:18px;overflow:auto;touch-action:pan-y}#panel{background:#50399cf2;border:2px solid #ffffff77;border-radius:26px;padding:20px;width:min(100%,370px);box-shadow:0 12px 50px #1e165c55;max-height:90dvh;overflow-y:auto;touch-action:pan-y}h1{font-size:31px;margin:0 0 8px}p{line-height:1.4;margin:9px 0}button{background:#ffda61;border:0;border-radius:13px;padding:11px 18px;font-weight:850;font-size:17px;color:#533574;cursor:pointer}button.secondary{background:#eee3ff;font-size:14px;padding:9px 12px}input{width:100%;font-size:17px;border:2px solid #cbb8ff;border-radius:12px;padding:11px;margin:7px 0 10px;touch-action:manipulation}#skinsPanel[hidden]{display:none}#skinsPanel{margin-top:12px;background:#34226e;border-radius:14px;padding:12px;text-align:left}#skinsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.skin-card{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:102px;padding:9px 3px;background:#6852a4;color:white;border:2px solid #ffffff33;border-radius:13px;font-size:12px}.skin-card.selected{border-color:#ffdc68;background:#7e60b9}.skin-card.locked{opacity:.65}.skin-emoji{font-size:28px}.skin-info{font-size:11px;text-align:center}#skinProgress{font-size:12px;line-height:1.4}#board[hidden]{display:none}#board{margin-top:12px;background:#34226e;border-radius:14px;padding:10px;text-align:left}#board h2{font-size:16px;margin:2px 0 8px;text-align:center}#scores{font-size:14px;max-height:145px;overflow:auto;touch-action:pan-y}#scores div{display:flex;justify-content:space-between;padding:5px 7px;border-bottom:1px solid #ffffff22}small{opacity:.88}#status{font-size:12px;min-height:17px}#actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}#nameLabel{font-size:13px;display:block;text-align:left}#best{font-weight:700}#coinHud{position:absolute;top:calc(env(safe-area-inset-top) + 15px);left:12px;z-index:2;background:#302060b9;color:#ffdc6d;padding:8px 12px;border-radius:18px;font-weight:900}#arenaHud{position:absolute;top:calc(env(safe-area-inset-top) + 88px);left:50%;transform:translateX(-50%);background:#261651c9;color:#fff;padding:7px 15px;border-radius:18px;font-size:13px;white-space:nowrap;pointer-events:none}#shopPanel[hidden],#arenaPanel[hidden]{display:none}#shopPanel,#arenaPanel{margin-top:12px;background:#30205e;border:1px solid #a18de8;border-radius:16px;padding:13px;text-align:left}#shopGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.shopItem{background:#6754a5;color:#fff;padding:12px 7px;font-size:13px;min-height:86px}#arenaStatus{font-size:13px;line-height:1.5}#arenaPanel input{margin:5px 0}#arenaPanel button{margin:3px}.hint{font-size:11px;opacity:.8}#panel{background:linear-gradient(155deg,#4930a8f7,#211346f5);box-shadow:0 0 55px #e59eff44,0 22px 70px #120e36aa}button{transition:transform .12s,filter .12s}button:active{transform:scale(.95)}.skin-card{box-shadow:inset 0 2px 10px #ffffff1c}#hud{text-shadow:0 0 14px #e3b6ff,0 4px 8px #211142}
+/* WILD BLOOM: premium overlay and HUD, no changes to underlying game network logic */
+:root{--mint:#94ffd5;--gold:#ffe9a6;--ink:#0c2330}
+html,body{background:#87c5dd}
+#overlay{background:linear-gradient(120deg,#031e2e88,#05253755 48%,#1b1c3a77);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:5}
+#panel{width:min(92vw,420px);max-height:min(91dvh,820px);padding:24px 22px 22px;background:linear-gradient(148deg,#0c3449eF,#132b49ed 58%,#342958e8);border:1px solid #e1fff58c;border-radius:28px;box-shadow:0 22px 85px #081d33c9, inset 0 1px #ffffff34,0 0 50px #a5ffc52a;scrollbar-color:#82eec766 transparent}
+.brandtag{font-size:10px;font-weight:900;letter-spacing:.23em;color:var(--mint);margin:0 0 8px;text-shadow:0 0 17px #76ffd4}
+#panel h1{font-family:system-ui,-apple-system,sans-serif;font-size:clamp(35px,8vw,47px);line-height:1;margin:0;font-weight:1000;letter-spacing:-.07em;text-shadow:0 5px #062334,0 0 25px #5ceebc8c;color:#f5fff5}
+#panel h1 em{font-style:normal;background:linear-gradient(140deg,#fff2ad,#e7b96d);background-clip:text;-webkit-background-clip:text;color:transparent}
+.tagline{font-size:10px;color:#d5e9dd;letter-spacing:.29em;font-weight:850;margin:8px 0 17px}
+#message{font-size:14px;color:#e6f8f1;margin:14px 0 18px}
+#nameLabel{font-size:11px;color:#a6e7d3;letter-spacing:.13em;font-weight:900}
+#player,#roomCode{border:1px solid #b9ffe68c;background:#ecfff9;color:#10313e;box-shadow:inset 0 2px 8px #90b9b21c;font-weight:750}
+#actions{gap:9px}
+button{background:linear-gradient(150deg,#fef8ba,#f3c36c);color:#2a3344;border:1px solid #ffffeb8a;box-shadow:0 5px 20px #090e2455,inset 0 1px #ffffffa8;transition:transform .14s,filter .14s,box-shadow .14s}
+button:active{transform:scale(.95)}button:focus-visible{outline:3px solid #9affd6;outline-offset:2px}
+#start{flex-basis:100%;font-size:19px;letter-spacing:.06em;padding:14px 18px;border-radius:15px;color:#233b42;background:linear-gradient(115deg,#fef4b9,#f5c068 70%,#ffdf8c);box-shadow:0 8px 24px #e8b16745,0 5px 10px #08162969}
+button.secondary{color:#f3fffa;background:linear-gradient(160deg,#377c78a6,#294867b5);border-color:#a3dddf4d;font-size:13px;box-shadow:inset 0 1px #ffffff24,0 5px 15px #071e3052;padding:11px 12px}
+#best{color:#ffe6a0;font-size:13px}#hud{top:calc(env(safe-area-inset-top) + 12px);font-size:54px;line-height:1;color:#fffdf1;text-shadow:0 4px 0 #17384566,0 0 24px #a9ffe8b0,0 9px 18px #163e4cbb;font-variant-numeric:tabular-nums}
+#level{font-size:12px;letter-spacing:.2em;text-shadow:0 2px 6px #184d54}
+#scoreHint{font-size:9px;letter-spacing:.3em;color:#fff9ce;margin-top:4px}
+#sound{background:#0a3853b9;color:#fff;border:1px solid #c6ffef80;box-shadow:0 4px 18px #082a46a3;backdrop-filter:blur(9px);width:42px;height:42px;padding:7px;z-index:3}
+#coinHud{background:linear-gradient(145deg,#0d3d51db,#124d4fbe);border:1px solid #c6ffe587;box-shadow:0 3px 18px #15424f99;color:#ffe6a0;backdrop-filter:blur(8px);font-variant-numeric:tabular-nums}
+#arenaHud{background:#0e3b50e0;border:1px solid #adffe5a1;z-index:4;box-shadow:0 4px 18px #00111d88;max-width:95vw;overflow:hidden;text-overflow:ellipsis}
+#qualityWrap{position:fixed;right:13px;bottom:calc(11px + env(safe-area-inset-bottom));z-index:3}
+#quality{font-size:10px;letter-spacing:.1em;background:#0d3e50bd;border:1px solid #9ff1d184;color:#d0ffec;padding:7px 10px;border-radius:11px;box-shadow:0 3px 17px #06344c75;backdrop-filter:blur(8px)}
+#fxToast{position:fixed;z-index:3;pointer-events:none;top:26%;left:50%;transform:translate(-50%,-10px) scale(.87);opacity:0;color:#fff9ca;font-size:clamp(17px,5vw,30px);font-weight:1000;text-shadow:0 3px 0 #286555,0 0 26px #f9ffe0;white-space:nowrap;transition:opacity .15s,transform .18s}
+#fxToast.show{opacity:1;transform:translate(-50%,0) scale(1)}
+#board,#shopPanel,#skinsPanel,#arenaPanel{background:#072d42ad;border:1px solid #89dfce56;box-shadow:inset 0 1px #ffffff18}
+.skin-card{background:#1d536ba9;border:1px solid #9cdbc661}.skin-card.selected{background:linear-gradient(145deg,#3f997d,#3b7294);border:2px solid #ffe39b;box-shadow:0 0 16px #f3dc8870}
+.shopItem{background:linear-gradient(150deg,#245870,#4d4b7c);border:1px solid #9ddfd76f;color:#fff}
+#scores div{border-bottom:1px solid #b5fff027}#status{color:#addad3}
+@media(max-height:600px){#panel{padding:17px 16px}.brandtag{font-size:9px}.tagline{margin:5px 0 10px}#message{margin:9px 0}#panel h1{font-size:34px}}
+@media(prefers-reduced-motion:reduce){button,#fxToast{transition:none}}
+
+/* WILD BLOOM — The Enchanted Menu: all settings moved away from gameplay */
+:root{--m-cream:#f7fff1;--m-green:#aeffe1;--m-muted:#b5d3d2;--m-line:#ffffff30;--m-dark:#0b2735}
+#overlay{background:radial-gradient(ellipse at 50% 40%,#133a42a0,#091f2baf 65%,#041720d9);backdrop-filter:blur(3.5px);-webkit-backdrop-filter:blur(3.5px);padding:clamp(10px,2.2vh,24px);z-index:6}
+#panel{position:relative;width:min(960px,96vw);max-height:min(94dvh,850px);padding:0;background:linear-gradient(142deg,#10354ddf,#102f40f2 56%,#192440f7);border-radius:30px;border:1px solid #d8ffdf69;box-shadow:0 25px 90px #001923e8,0 0 85px #5be9ad20,inset 0 1px 0 #ffffff3d;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#91d6b274 transparent;isolation:isolate;color:var(--m-cream);text-align:left}
+#panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 27% 31%,#8ef5bf24,transparent 40%),radial-gradient(ellipse at 88% 86%,#ad92ff18,transparent 45%)}
+.menuView[hidden]{display:none!important}#panel .menuView{min-width:0}
+.menuBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 26px 14px;border-bottom:1px solid #ffffff18;background:linear-gradient(90deg,#ffffff08,#ffffff00)}
+.studioMark{display:flex;align-items:center;gap:9px;font-weight:950;letter-spacing:.23em;font-size:11px;color:#f4fff5}.studioMark small{font-size:9px;opacity:.65;letter-spacing:.13em}.markGem{display:grid;place-items:center;width:31px;height:31px;background:linear-gradient(145deg,#84ffb2,#38bca0);border-radius:11px;color:#103c43;box-shadow:0 0 25px #82ffc44a;font-size:19px}
+.menuTopRight{display:flex;gap:10px;align-items:center}.versionPill,.coinsPill{border:1px solid #ffffff2e;background:#14394a88;border-radius:99px;padding:8px 12px;color:#c6ebdd;font-size:10px;font-weight:900;letter-spacing:.06em}.coinsPill{color:#ffedab;font-size:13px;min-width:76px;text-align:center}
+.menuLayout{display:grid;grid-template-columns:1.04fr 1fr;gap:0;padding:18px 18px 15px}
+.heroSide{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:520px;padding:22px 26px 28px;overflow:hidden;text-align:center;background:radial-gradient(ellipse at 50% 22%,#7af3b819,transparent 65%);border-radius:20px}
+.heroOrbs{width:100%;height:230px;position:relative;display:grid;place-items:center;isolation:isolate}
+.heroAura{position:absolute;width:210px;height:210px;top:0;left:50%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#f4fbb484 0,#b6ffd542 29%,#7beba818 54%,transparent 74%);filter:blur(9px);animation:heroPulse 5s ease-in-out infinite alternate}
+.heroGround{position:absolute;width:220px;height:28px;bottom:7px;left:50%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,#072731cc,#153d3966 45%,transparent 75%);filter:blur(8px)}
+.mascot{position:relative;width:132px;height:121px;z-index:2;margin-bottom:13px;background:radial-gradient(ellipse at 30% 16%,#fffef6 0%,#ffe2f7 18%,#ee92db 47%,#ae5faf 78%,#573a95 100%);border:2px solid #fff3f3af;border-radius:43% 47% 43% 46%/44% 46% 55% 52%;box-shadow:inset -13px -14px 25px #50308771,inset 10px 9px 19px #fff7fb86,0 22px 35px #1a224b8e,0 0 48px #ffaef088;transform-origin:bottom center;animation:mascotFloat 3.9s ease-in-out infinite}
+.mascotGloss{position:absolute;top:13px;left:19px;width:58px;height:23px;transform:rotate(-21deg);border-radius:50%;background:#ffffffaa;filter:blur(1px)}
+.mascotEye{position:absolute;top:47px;width:13px;height:20px;background:#1f2d4c;border-radius:50%;box-shadow:inset -2px -2px #161d35}.mascotEye:before{content:"";position:absolute;top:4px;left:3px;width:5px;height:7px;border-radius:50%;background:white}.eyeL{left:42px}.eyeR{right:40px}.mascotSmile{position:absolute;left:57px;top:76px;width:19px;height:10px;border-bottom:3px solid #532a64;border-radius:0 0 50% 50%}.mascotCheek{position:absolute;top:69px;width:17px;height:7px;background:#ff7dad9e;border-radius:100%}.cheekL{left:19px}.cheekR{right:18px}
+.orbLeaf{position:absolute;z-index:2;color:#e5f8ae;font-size:22px;opacity:.9;text-shadow:0 0 24px #e7ffe9;animation:twinkle 3.3s ease-in-out infinite alternate}.leafA{left:16%;top:20%}.leafB{right:18%;top:34%;color:#c4f9ff;animation-delay:.8s}.leafC{left:27%;bottom:28%;font-size:13px;animation-delay:1.7s}
+#panel .brandtag{font-size:10px;letter-spacing:.23em;color:#bcf9d1;margin:0 0 10px;text-shadow:0 0 20px #a6ffd077}
+#panel h1{white-space:nowrap;font-size:clamp(38px,4.9vw,63px);letter-spacing:-.075em;line-height:1.05;margin:0 0 5px;color:#fffdf2;text-shadow:0 3px 0 #163b42,0 9px 29px #92ffd654}
+#panel h1 em{background:none;-webkit-text-fill-color:#f8d991;color:#f8d991;text-shadow:0 3px #255a52,0 0 25px #ffe1a75c}
+.tagline{font-size:10px;letter-spacing:.28em;font-weight:900;color:#a6e6d3;margin:0 0 17px}
+#message{font-size:13px;color:#e0eee7;line-height:1.55;max-width:335px;margin:0 auto 15px;text-align:center}
+.heroBadges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}.heroBadges span{font-size:9px;letter-spacing:.04em;color:#caf4df;border:1px solid #a7eccc32;background:#235c5873;border-radius:30px;padding:7px 9px;font-weight:900}
+.actionSide{border:1px solid #ffffff16;border-radius:22px;background:linear-gradient(160deg,#ffffff0c,#081a320e);padding:18px;box-shadow:inset 0 1px #ffffff12}
+.profileQuick{display:flex;align-items:center;width:100%;gap:13px;text-align:left;border-radius:17px;background:linear-gradient(90deg,#2e766d78,#23516752);border:1px solid #b9ffdf4f;color:#eafff3;box-shadow:inset 0 1px #ffffff24;padding:12px 14px}
+.profileAvatar{width:40px;height:40px;display:grid;place-items:center;font-size:23px;border-radius:14px;background:linear-gradient(160deg,#ffbdef,#9a75ff);box-shadow:0 4px 12px #0a1c3694}.profileQuickText{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.profileQuickText small{font-size:9px;letter-spacing:.15em;color:#bde9d7}.profileQuickText strong{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profileChevron{font-size:26px;color:#b2f5de;font-weight:400}
+#start.megaPlay{width:100%;display:flex;align-items:center;gap:14px;text-align:left;margin-top:14px;border-radius:17px;padding:17px 17px;background:linear-gradient(105deg,#fff2b5,#ffc971 66%,#f2af66);color:#183543;border:1px solid #fffada;box-shadow:0 10px 32px #e4bb6672,inset 0 2px #ffffffb5;letter-spacing:normal}
+#start.megaPlay:hover{filter:brightness(1.07);transform:translateY(-2px)}.playGlyph{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#fff7cfad;box-shadow:inset 0 1px #fff;flex-shrink:0;font-size:20px}.playLabel{display:flex;flex-direction:column;gap:2px;flex:1}.playLabel strong{font-size:23px;font-weight:1000;letter-spacing:.04em}.playLabel small{font-size:11px;font-weight:700;color:#51615f}.playArrow{font-size:22px;font-weight:500;opacity:.6}
+.sectionOverline{display:flex;justify-content:space-between;align-items:center;padding:19px 3px 10px;color:#a6d9d2;font-size:10px;font-weight:950;letter-spacing:.17em}
+#actions.menuGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.menuTile{display:flex;position:relative;min-width:0;align-items:center;gap:11px;padding:14px 11px;min-height:83px;text-align:left;border:1px solid #c6ffea35;border-radius:16px;background:linear-gradient(145deg,#2c786c6e,#193e5859);box-shadow:inset 0 1px #ffffff2a,0 4px 20px #071f3559;color:#fff}.menuTile:hover{transform:translateY(-2px);filter:brightness(1.15)}.menuTile.amber{background:linear-gradient(145deg,#846d4288,#63425b62)}.menuTile.violet{background:linear-gradient(145deg,#61558a88,#37355e81)}.menuTile.pink{background:linear-gradient(145deg,#7d4c7a88,#54405c90)}
+.tileIcon{display:grid;place-items:center;width:35px;height:35px;flex-shrink:0;border-radius:12px;background:#ffffff1c;font-size:21px}.tileCopy{display:flex;flex-direction:column;min-width:0;gap:4px}.tileCopy strong{font-size:13px;white-space:nowrap}.tileCopy small{font-size:10px;color:#e2ece5bd;white-space:normal;line-height:1.3}.tileArrow{position:absolute;top:8px;right:9px;color:#d9f8e86e;font-size:12px}
+.menuExtra{display:flex;gap:9px;margin-top:12px}.extraButton{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;color:#d9f7e8;font-size:12px;font-weight:900;border-radius:13px;background:#183e507d;border:1px solid #c3f8d735;box-shadow:inset 0 1px #ffffff1b}
+.homeBest{color:#fff0b6;font-size:12px;font-weight:900;margin:13px 0 1px;text-align:center}
+.menuFooter{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #ffffff1a;padding:10px 25px 14px;color:#b3e1d17e;font-size:9px;letter-spacing:.08em;font-weight:800}
+/* Submenus */
+#panel .subView{padding:24px clamp(18px,5vw,36px) 30px;min-height:490px;max-width:700px;margin:auto}
+.subTop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:24px}.subTag{color:#8de9c0;font-size:10px;font-weight:900;letter-spacing:.17em}.backButton{padding:10px 15px;border-radius:11px;border:1px solid #a9f5d46b;color:#e7fff0;font-size:13px;background:#2c5e6375;box-shadow:none}
+.subHero{display:flex;align-items:center;gap:17px;margin-bottom:24px}.subSymbol{display:grid;place-items:center;border-radius:19px;width:69px;height:69px;flex-shrink:0;font-size:33px;background:linear-gradient(140deg,#3a9a8499,#4b557dbb);border:1px solid #c4ffe17c;box-shadow:0 8px 25px #031a329c}
+#panel .subHero h2{margin:0 0 4px;font-size:clamp(25px,5vw,35px);letter-spacing:-.04em;color:#f2fff7}#panel .subHero p{font-size:13px;line-height:1.35;color:#bed9d3;margin:0}
+.settingsList{display:grid;gap:12px}.settingCard{display:flex;align-items:center;gap:14px;background:linear-gradient(130deg,#296b6775,#25475e5c);border:1px solid #d5ffee4e;padding:17px 15px;border-radius:17px;box-shadow:inset 0 1px #ffffff18}.settingIcon{display:grid;place-items:center;width:43px;height:43px;flex-shrink:0;font-size:23px;border-radius:13px;background:#ffffff1b}.settingBody{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}.settingBody strong{font-size:15px;color:#f3fff6}.settingBody small{font-size:11px;line-height:1.3;color:#b8d6d1}
+#settingsPanel #qualityWrap{position:static;z-index:auto}#settingsPanel #quality,#settingsPanel #sound{position:static;display:block;width:auto;min-width:110px;height:auto;border-radius:12px;padding:11px 13px;white-space:nowrap;text-align:center;font-size:12px;letter-spacing:.01em;font-weight:950;color:#17343b;background:linear-gradient(140deg,#f6ffce,#a5ecc9);border:1px solid #ffffffa3;box-shadow:0 5px 18px #021e2d66;backdrop-filter:none}
+.settingNote{padding:16px 18px;border-radius:15px;color:#bddecf;border:1px solid #a6f5d82d;background:#1b4b4970;font-size:12px;line-height:1.6;margin-top:18px}
+.backPrimary{display:block;width:100%;padding:14px 16px;background:linear-gradient(110deg,#ffefa7,#ffce80);color:#24383d;border-radius:14px;font-size:15px;font-weight:950;margin-top:16px}
+#player,#roomCode{color:#123943;font-weight:800;background:#e8fff4;border:1px solid #ffffffad;border-radius:13px;box-shadow:inset 0 2px 7px #17364118;padding:13px 14px;font-size:15px}
+#nameLabel{font-size:12px;color:#b4f5d9;font-weight:900}.profileNotice{font-size:12px;color:#aceacf;min-height:17px;margin:6px 0}
+.statGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.statCard{border-radius:15px;padding:17px;background:#2b6d6c53;border:1px solid #a3ffda4d;display:flex;flex-direction:column;gap:7px}.statCard small{font-size:10px;font-weight:950;letter-spacing:.09em;color:#b7e8dc}.statCard strong{font-size:24px;color:#ffebb8;overflow-wrap:anywhere}.subHelp{font-size:12px;line-height:1.6;color:#c7e6db;margin:10px 0 18px}
+#shopPanel,#skinsPanel,#arenaPanel,#board{background:transparent;border:0;box-shadow:none;border-radius:0;margin-top:0;text-align:left}#shopGrid{gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px}.shopItem{min-height:108px;padding:20px 10px;background:linear-gradient(145deg,#2f7d7b80,#515a8988);border:1px solid #b1f2dd78;border-radius:15px;font-size:13px}#skinsGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}.skin-card{min-height:119px;background:linear-gradient(140deg,#305a7f8c,#584e8b8e);border:1px solid #b3f5dc5c;border-radius:15px}.skin-card.selected{border:2px solid #ffe5a5;background:linear-gradient(140deg,#31876b,#426b86)}#skinProgress{font-size:13px;color:#d9fce7}
+#arenaSetup{display:flex;flex-direction:column;gap:8px}#arenaSetup .backPrimary{margin:6px 0}.roomDivider{color:#a3d1c8;text-align:center;font-size:12px;margin:5px 0}.secondaryAlt{display:block;background:linear-gradient(145deg,#477b83,#374f79);color:#f2fff5;border:1px solid #b9ffe573;border-radius:13px;padding:12px;font-size:14px;margin-top:12px}#arenaStatus{color:#ffebbf;font-size:13px;line-height:1.5;padding:4px 0;min-height:18px}#arenaPanel [hidden]{display:none!important}
+#scores{background:#16445275;border:1px solid #9af3d05b;border-radius:16px;overflow:auto;max-height:330px;padding:10px;font-size:14px}#scores div{padding:11px 9px;border-bottom:1px solid #9bffde21}#status{font-size:12px;color:#b1eed4}
+/* Keep the game itself minimal: only game score, currency and duel score are HUD. */
+body:not(.is-playing) #hud,body:not(.is-playing) #coinHud,body:not(.is-playing) #arenaHud{display:none!important}
+#qualityWrap,#sound{touch-action:manipulation}
+@keyframes mascotFloat{0%,100%{transform:translateY(3px) rotate(-3deg) scale(1)}50%{transform:translateY(-10px) rotate(3deg) scale(1.04)}}
+@keyframes heroPulse{0%{opacity:.73;transform:translateX(-50%) scale(.94)}100%{opacity:1;transform:translateX(-50%) scale(1.12)}}
+@keyframes twinkle{0%{opacity:.3;transform:translateY(6px) scale(.7)}100%{opacity:1;transform:translateY(-8px) scale(1.13)}}
+@media(max-width:740px){#panel{width:min(460px,96vw);max-height:95dvh;border-radius:25px}.menuBar{padding:11px 15px 10px}.studioMark{font-size:10px;letter-spacing:.14em}.studioMark small{display:none}.versionPill{display:none}.menuLayout{display:block;padding:10px}.heroSide{min-height:0;padding:4px 12px 17px}.heroOrbs{height:145px}.heroAura{width:150px;height:150px}.mascot{width:89px;height:82px;margin-bottom:9px}.mascotGloss{width:36px;height:13px;top:10px;left:12px}.mascotEye{width:9px;height:14px;top:31px}.mascotEye:before{width:3px;height:5px;top:3px;left:2px}.eyeL{left:28px}.eyeR{right:27px}.mascotSmile{left:37px;top:49px;width:15px;height:7px;border-bottom-width:2px}.mascotCheek{top:46px;width:13px;height:5px}.cheekL{left:11px}.cheekR{right:11px}.heroGround{width:145px;bottom:2px}.heroBadges{display:none}#panel .brandtag{font-size:9px;margin-bottom:5px}#panel h1{font-size:clamp(34px,10vw,48px)}.tagline{margin-bottom:8px;font-size:9px}.heroSide #message{max-width:300px;font-size:11px;margin-bottom:0;line-height:1.4}.actionSide{padding:11px;border-radius:18px}.profileQuick{padding:9px 10px}.profileAvatar{width:34px;height:34px;font-size:20px}.profileQuickText strong{font-size:13px}#start.megaPlay{padding:11px 13px;margin-top:10px}.playGlyph{width:39px;height:39px}.playLabel strong{font-size:20px}.sectionOverline{padding:13px 2px 9px}.menuTile{min-height:72px;padding:10px 8px;gap:7px}.tileIcon{width:31px;height:31px;font-size:18px}.tileCopy strong{font-size:12px}.tileCopy small{font-size:9px}.menuExtra{margin-top:9px}.extraButton{padding:9px}.homeBest{margin:9px 0 0}.menuFooter{padding:7px 15px 10px}.menuFooter span:last-child{display:none}#panel .subView{min-height:470px;padding:19px 16px 24px}.subTop{margin-bottom:19px}}
+@media(max-width:360px){.studioMark{font-size:9px}.coinsPill{padding:7px}.heroOrbs{height:119px}.mascot{transform:scale(.85)}.menuLayout{padding:6px}.menuTile{min-height:66px}.tileCopy small{display:none}.tileCopy strong{font-size:11px}.tileIcon{width:28px;height:28px}}
+@media(max-height:740px) and (max-width:740px){.heroOrbs{height:103px}.mascot{transform:scale(.8)}.heroSide{padding-bottom:10px}.heroSide #message{display:none}.sectionOverline{padding-top:9px}.menuTile{min-height:63px}.menuFooter{display:none}.tagline{margin-bottom:4px}}
+@media(max-width:520px){.settingCard{flex-wrap:wrap}.settingBody{min-width:125px}.settingCard #qualityWrap,.settingCard #sound{margin-left:auto}.settingIcon{width:39px;height:39px}}
+@media(prefers-reduced-motion:reduce){.mascot,.heroAura,.orbLeaf{animation:none}}
+
+/* WILD BLOOM ✦ COLLECTION UPDATE: exact-size home tiles, compact shop, character portraits */
+#actions.menuGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+#actions.menuGrid .menuTile{width:100%;height:87px;min-height:87px;max-height:87px;display:flex;align-items:center;justify-content:flex-start;padding:13px 11px;gap:10px}
+#actions.menuGrid .tileIcon{width:39px;height:39px;font-size:22px;flex:0 0 39px}
+#actions.menuGrid .tileCopy{min-width:0;flex:1}
+#actions.menuGrid .tileCopy strong{line-height:1.13}
+#actions.menuGrid .tileCopy small{display:block;line-height:1.2;margin-top:4px}
+#shopGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+#shopGrid .shopItem{min-height:92px;max-height:102px;display:flex;align-items:center;justify-content:flex-start;gap:12px;padding:8px 12px;text-align:left;border-radius:17px;overflow:hidden}
+#shopGrid .shopItem:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.shopArt{height:69px;width:71px;flex:0 0 71px;display:grid;place-items:center;border-radius:18px;font-size:48px;line-height:1;background:radial-gradient(circle at 40% 30%,#ffeeb771,#338fac3f 58%,#243e5c11);box-shadow:inset 0 1px 10px #ffffff3a,0 0 17px #e6beff28;filter:drop-shadow(0 2px 7px #d7ecff3d)}
+.shopArt.art-crown{background:radial-gradient(circle at 50% 40%,#fff0ad69,#d2a25a33 67%,transparent)}
+.shopArt.art-spark{background:radial-gradient(circle,#fff0a379,#5c5ad25d 70%,transparent)}
+.shopArt.art-halo{background:radial-gradient(circle,#fffdd974,#4eafff25 70%,transparent)}
+.shopCopy{display:flex;flex:1;min-width:0;flex-direction:column;align-items:flex-start;gap:3px}
+.shopTitle{font-size:clamp(12px,1.6vw,16px);line-height:1.2;color:#f8fff9;white-space:normal}
+.shopCaption{font-size:10px;line-height:1.15;color:#bbdddc}
+.shopCost{color:#ffe08e;font-size:13px;font-weight:900;line-height:1.2;margin-top:2px}
+#shopGrid .shopActive{border:2px solid #ffe29a;background:linear-gradient(145deg,#368b71,#374a83)}
+#skinsPanel.subView{max-width:825px}
+#skinsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:13px}
+#skinsGrid .skin-card{position:relative;min-height:178px;display:flex;flex-direction:column;align-items:center;padding:9px 7px 11px;gap:3px;overflow:hidden;background:linear-gradient(145deg,#245773c9,#444978b8);border-radius:17px;border:1px solid #9fe8d36b;color:#fff}
+#skinsGrid .skin-card.selected{border:2px solid #ffebae;background:linear-gradient(145deg,#268e7b,#485e8d);box-shadow:0 0 18px #ffe4a84f,inset 0 1px #ffffff54}
+#skinsGrid .skin-card.locked{opacity:.83;filter:saturate(.85)}
+#skinsGrid .skin-card:hover:not(:disabled){transform:translateY(-3px);filter:brightness(1.08)}
+.skinPortrait{display:block;width:100px;height:91px;max-width:95%;position:relative;background:radial-gradient(ellipse at center,#d0fff328,transparent 70%)}
+.skinPortraitCanvas{display:block;width:100px;height:91px;max-width:100%}
+.skinName{font-size:15px;line-height:1.2;color:#f2fff7}
+#skinsGrid .skin-info{font-size:10.5px;line-height:1.25;min-height:25px;display:grid;place-items:center;color:#cfece8;text-align:center}
+#skinsGrid .selected .skin-info{color:#ffe6a2;font-weight:900}
+.skinUnlockTrack{height:4px;width:88%;border-radius:99px;background:#001b296a;overflow:hidden;display:block;margin-top:auto}
+.skinUnlockFill{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#7ce9c3,#ffe9a0)}
+#skinProgress{color:#d4ffdf;font-size:12px;line-height:1.5}
+@media(max-width:740px){#actions.menuGrid .menuTile{height:74px;min-height:74px;max-height:74px;padding:10px 9px;gap:7px}#actions.menuGrid .tileIcon{width:32px;height:32px;font-size:18px;flex-basis:32px}#actions.menuGrid .tileCopy strong{font-size:12px}#actions.menuGrid .tileCopy small{font-size:9px}#skinsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#skinsGrid .skin-card{min-height:168px}.skinPortrait{height:85px}#shopGrid .shopItem{min-height:100px;max-height:none;gap:6px;padding:9px 5px;flex-direction:column;text-align:center}.shopArt{flex:0 0 48px;width:56px;height:48px;font-size:40px;border-radius:12px}.shopCopy{align-items:center;gap:2px}.shopTitle{font-size:12px}.shopCaption{display:none}.shopCost{font-size:11px;margin-top:2px}}
+@media(max-width:370px){#actions.menuGrid .menuTile{height:67px;min-height:67px;max-height:67px}#actions.menuGrid .tileCopy small{display:none}#skinsGrid .skin-card{min-height:157px}.skinPortrait{height:77px}#skinsGrid .skin-info{font-size:9.5px}}
+
+/* WILD BLOOM LEGENDS ✦ game-integrated worlds, missions, collectibles and powers */
+#worldsPanel,#missionsPanel{max-width:850px}
+#worldsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:14px}
+.worldCard{position:relative;isolation:isolate;overflow:hidden;min-height:175px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;text-align:left;gap:7px;padding:19px 18px;color:#fff;background:#294b66;border-radius:22px;border:2px solid #ffffff48;box-shadow:inset 0 1px #fff5,0 10px 27px #0004;cursor:pointer;transition:transform .15s,border-color .15s}
+.worldCard:before{content:'';position:absolute;inset:0;z-index:-2;background:var(--world-bg);opacity:.94}
+.worldCard:after{content:'';position:absolute;inset:45% 0 0;z-index:-1;background:linear-gradient(0deg,#101832d9,transparent)}
+.worldCard:hover:not(:disabled){transform:translateY(-3px)}
+.worldCard.selected{border-color:#ffdc84;box-shadow:0 0 25px #ffe79b62,inset 0 1px #fff5}
+.worldCard.locked{filter:saturate(.55);opacity:.83}
+.worldCard .worldIcon{font-size:53px;line-height:1;filter:drop-shadow(0 4px 8px #0007);position:absolute;top:16px;right:16px}
+.worldCard .worldTitle{font-size:21px;font-weight:900;text-shadow:0 2px 8px #0009}
+.worldCard .worldDesc{font-size:12px;color:#f4fff5;text-shadow:0 2px 8px #000a}
+.worldCard .worldUnlock{font-size:12px;color:#ffeaa9;font-weight:800}
+#missionsGrid{display:grid;gap:13px;margin-top:16px}
+.missionCard{display:grid;grid-template-columns:55px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 15px;border:1px solid #9fefcc63;background:linear-gradient(125deg,#1b5064d9,#394673c9);border-radius:19px;box-shadow:inset 0 1px #ffffff2b}
+.missionIcon{font-size:37px;text-align:center;filter:drop-shadow(0 2px 8px #fff6)}
+.missionInfo{min-width:0;display:grid;gap:5px}
+.missionInfo strong{font-size:15px;color:#faffed}.missionInfo small{font-size:12px;color:#cbe6e7}
+.missionBar{height:7px;overflow:hidden;border-radius:20px;background:#0a253aab}
+.missionBar span{display:block;height:100%;background:linear-gradient(90deg,#62dfbb,#ffdb7e);border-radius:20px;transition:width .2s}
+.missionClaim{min-width:94px;border-radius:12px;padding:10px 9px;font-size:12px;white-space:nowrap;background:#ffe28c;color:#4d3365}
+.missionClaim:disabled{opacity:.65;cursor:default;filter:grayscale(.15)}
+.missionDate{font-size:13px;font-weight:800;color:#ffe7a6;margin:4px 0 10px}
+#powerHud{position:absolute;top:calc(env(safe-area-inset-top) + 136px);right:12px;z-index:3;pointer-events:none;padding:8px 12px;border-radius:16px;background:#15233cb8;color:#fff0ba;font-size:13px;font-weight:800;text-shadow:0 1px 4px #000b;backdrop-filter:blur(8px);max-width:42vw;line-height:1.4}
+#powerHud[hidden]{display:none!important}
+#skinsGrid .skin-card.legendarySkin{border-color:#eecb75a9;background:linear-gradient(140deg,#605080,#164f75 72%,#293d5a);box-shadow:inset 0 1px #fff5,0 0 15px #f0ca6035}
+#skinsGrid .skin-card.legendarySkin.selected{border:2px solid #ffe68a;box-shadow:0 0 23px #ffe5855c}
+#skinsGrid .legendarySkin .skinName:before{content:'👑 ';font-size:12px}
+.legendPill{position:absolute;right:4px;top:5px;font-size:8px;font-weight:900;letter-spacing:.05em;color:#fff0bd;background:#463154bd;border:1px solid #ffe4a57d;padding:3px 4px;border-radius:8px}
+@media(max-width:600px){#worldsGrid{gap:9px}.worldCard{min-height:154px;padding:13px 11px}.worldCard .worldIcon{font-size:38px;top:10px;right:10px}.worldCard .worldTitle{font-size:16px}.worldCard .worldDesc,.worldCard .worldUnlock{font-size:10px}.missionCard{grid-template-columns:33px minmax(0,1fr);gap:7px;padding:11px}.missionIcon{font-size:26px}.missionClaim{grid-column:2;justify-self:start}.missionInfo strong{font-size:13px}.missionInfo small{font-size:11px}#powerHud{top:calc(env(safe-area-inset-top) + 100px);font-size:11px;padding:6px 8px}}
+@media(max-width:360px){.worldCard{min-height:132px}.worldCard .worldIcon{font-size:28px}.worldCard .worldTitle{font-size:14px}}
+</style></head><body><canvas id="game"></canvas><div id="coinHud">🪙 <span id="coinCount">0</span></div><div id="arenaHud" hidden></div><div id="powerHud" hidden></div><div id="fxToast" aria-live="polite"></div><div id="hud"><div id="score">0</div><div id="level">ΕΠΙΠΕΔΟ 1</div><div id="scoreHint">✦ FLY HIGH ✦</div></div><div id="overlay"><main id="panel" aria-label="Jelly Jump - Κεντρικό μενού">
+<section id="homeView" class="menuView homeView">
+  <header class="menuBar">
+    <div class="studioMark"><span class="markGem">✦</span><span>WILD BLOOM <small>LEGENDS</small></span></div>
+    <div class="menuTopRight"><span class="versionPill">✧ SEASON 02</span><span class="coinsPill">🪙 <strong id="menuCoins">0</strong></span></div>
+  </header>
+  <div class="menuLayout">
+    <div class="heroSide">
+      <div class="heroOrbs"><span class="orbLeaf leafA">✦</span><span class="orbLeaf leafB">✳</span><span class="orbLeaf leafC">✦</span><div class="heroAura"></div><div class="heroGround"></div><div class="mascot" aria-hidden="true"><span class="mascotGloss"></span><span class="mascotEye eyeL"></span><span class="mascotEye eyeR"></span><span class="mascotSmile"></span><span class="mascotCheek cheekL"></span><span class="mascotCheek cheekR"></span></div></div>
+      <div class="brandtag">✧ A LITTLE WORLD OF WONDER ✧</div>
+      <h1>JELLY <em>JUMP</em></h1>
+      <div class="tagline">FIVE ENCHANTED WORLDS</div>
+      <p id="message">Εξερεύνησε 5 κόσμους, ανακάλυψε μαγικές δυνάμεις και ξεκλείδωσε θρυλικά Jelly!</p>
+      <div class="heroBadges"><span>🌿 WILD FOREST</span><span>⚔ ONLINE 1V1</span><span>👑 26 SKINS</span></div>
+    </div>
+    <div class="actionSide">
+      <button id="profileQuick" class="profileQuick" type="button"><span class="profileAvatar">🍮</span><span class="profileQuickText"><small>ΚΑΛΩΣ ΗΡΘΕΣ</small><strong id="menuUsername">Νέος παίκτης</strong></span><span class="profileChevron">›</span></button>
+      <button id="start" class="megaPlay" type="button"><span class="playGlyph">▶</span><span class="playLabel"><strong id="playText">ΕΝΑΡΞΗ</strong><small>Ξεκίνα την περιπέτεια</small></span><span class="playArrow">↗</span></button>
+      <div class="sectionOverline"><span>ΕΞΕΡΕΥΝΗΣΕ ΤΟ ΠΑΙΧΝΙΔΙ</span><span>✦</span></div>
+      <div id="actions" class="menuGrid">
+        <button type="button" class="menuTile teal" id="settingsButton"><span class="tileIcon">⚙️</span><span class="tileCopy"><strong>Ρυθμίσεις</strong><small>Ήχος & γραφικά</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile amber" id="shopButton"><span class="tileIcon">🛍️</span><span class="tileCopy"><strong>Κατάστημα</strong><small>Coins & αντικείμενα</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile violet" id="profileButton"><span class="tileIcon">👤</span><span class="tileCopy"><strong>Προφίλ</strong><small>Παίκτης & ρεκόρ</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile pink" id="arenaButton"><span class="tileIcon">⚔️</span><span class="tileCopy"><strong>1v1 Online</strong><small>Πρόκληση φίλου</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile teal" id="skinsButton"><span class="tileIcon">🎨</span><span class="tileCopy"><strong>Skins</strong><small>Διάλεξε το Jelly σου</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile amber" id="refresh"><span class="tileIcon">🏆</span><span class="tileCopy"><strong>Κατάταξη</strong><small>Οι καλύτεροι φίλοι</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile violet" id="worldsButton"><span class="tileIcon">🌍</span><span class="tileCopy"><strong>Κόσμοι</strong><small>5 μαγικές περιοχές</small></span><span class="tileArrow">↗</span></button>
+        <button type="button" class="menuTile teal" id="missionsButton"><span class="tileIcon">🎯</span><span class="tileCopy"><strong>Αποστολές</strong><small>3 καθημερινά δώρα</small></span><span class="tileArrow">↗</span></button>
+      </div>
+      <p id="best" class="homeBest">🏆 Προσωπικό ρεκόρ: 0</p>
+    </div>
+  </div>
+  <footer class="menuFooter"><span>✦ Κάθε άλμα είναι μια νέα περιπέτεια</span><span>JELLY JUMP © WILD BLOOM LEGENDS</span></footer>
+</section>
+<section id="settingsPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">GAME OPTIONS ✦</span></div>
+  <div class="subHero"><div class="subSymbol">⚙️</div><div><h2>Ρυθμίσεις</h2><p>Προσαρμόζεις το παιχνίδι όπως σου αρέσει.</p></div></div>
+  <div class="settingsList">
+    <div class="settingCard"><div class="settingIcon">✨</div><div class="settingBody"><strong>Ποιότητα γραφικών</strong><small id="qualityState">ULTRA — πλήρης οπτική ποιότητα</small></div><div id="qualityWrap"><button id="quality" type="button" aria-label="Αλλαγή ποιότητας γραφικών">✦ ULTRA</button></div></div>
+    <div class="settingCard"><div class="settingIcon">🎵</div><div class="settingBody"><strong>Μουσική & ήχοι</strong><small id="soundState">Ήχος ενεργός</small></div><button id="sound" type="button" aria-label="Ενεργοποίηση ή απενεργοποίηση ήχου">🔊 ON</button></div>
+  </div>
+  <div class="settingNote">💾 Οι επιλογές αποθηκεύονται αυτόματα σε αυτή τη συσκευή. Κατά τη διάρκεια του παιχνιδιού τα κουμπιά ήχου και γραφικών δεν εμφανίζονται στην οθόνη.</div>
+  <button class="backPrimary" type="button" data-back="homeView">✓ Έτοιμο</button>
+</section>
+<section id="profilePanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">YOUR JOURNEY ✦</span></div>
+  <div class="subHero"><div class="subSymbol">👤</div><div><h2>Το προφίλ σου</h2><p>Το όνομα και οι επιδόσεις του παίκτη.</p></div></div>
+  <label id="nameLabel" for="player">ΟΝΟΜΑ ΠΑΙΚΤΗ</label><input id="player" maxlength="18" placeholder="Γράψε το όνομά σου" autocomplete="nickname"><button id="saveProfile" class="backPrimary" type="button">✓ Αποθήκευση ονόματος</button><p class="profileNotice" id="profileNotice" aria-live="polite"></p>
+  <div class="statGrid"><div class="statCard"><small>🏆 ΡΕΚΟΡ</small><strong id="profileBestValue">0</strong></div><div class="statCard"><small>🪙 COINS</small><strong id="profileCoinsValue">0</strong></div><div class="statCard"><small>🎨 SKIN</small><strong id="profileSkinValue">Classic</strong></div><div class="statCard"><small>✦ ΣΥΝΟΛΙΚΟΙ ΠΟΝΤΟΙ</small><strong id="profilePointsValue">0</strong></div></div>
+  <p class="subHelp">Η πρόοδος και τα coins αποθηκεύονται στη συσκευή. Η online κατάταξη των φίλων παραμένει κοινή.</p>
+</section>
+<section id="shopPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">JELLY MARKET ✦</span></div>
+  <div class="subHero"><div class="subSymbol">🛍️</div><div><h2>Κατάστημα</h2><p>Αντικείμενα για το αγαπημένο σου Jelly.</p></div></div>
+  <p class="subHelp">🪙 Κέρδισε 1 coin ανά πόντο. Coins και αγορές αποθηκεύονται σε αυτή τη συσκευή.</p><div id="shopGrid"></div>
+</section>
+<section id="skinsPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">YOUR STYLE ✦</span></div>
+  <div class="subHero"><div class="subSymbol">🎨</div><div><h2>Τα Jelly σου</h2><p>Διάλεξε χρώμα και χαρακτήρα.</p></div></div>
+  <p id="skinProgress"></p><div id="skinsGrid"></div><p class="subHelp">Ξεκλείδωσε 26 Jelly, ανάμεσά τους 6 Legendary, με σκορ και συνολικούς πόντους. Αποθήκευση ανά συσκευή.</p>
+</section>
+<section id="worldsPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">THE FIVE REALMS ✦</span></div>
+  <div class="subHero"><div class="subSymbol">🌍</div><div><h2>Μαγικοί κόσμοι</h2><p>Διάλεξε πού θα ταξιδέψει το Jelly σου.</p></div></div>
+  <p class="subHelp" id="worldProgress">Ξεκλείδωσε νέες τοποθεσίες παίζοντας!</p><div id="worldsGrid"></div>
+  <p class="subHelp">Οι κόσμοι αλλάζουν εμφάνιση και εμπόδια. Το gameplay παραμένει δίκαιο για όλους.</p>
+</section>
+<section id="missionsPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">DAILY QUESTS ✦</span></div>
+  <div class="subHero"><div class="subSymbol">🎯</div><div><h2>Ημερήσιες αποστολές</h2><p>Παίξε κάθε μέρα και κέρδισε δωρεάν Coins!</p></div></div>
+  <div class="missionDate" id="missionDate"></div><div id="missionsGrid"></div>
+  <p class="subHelp">Η ημερομηνία και η πρόοδος των αποστολών βασίζονται στη συσκευή σου. Οι ανταμοιβές δίνονται μόνο μία φορά ανά αποστολή και ημέρα.</p>
+</section>
+<section id="arenaPanel" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">FRIENDS ARENA ✦</span></div>
+  <div class="subHero"><div class="subSymbol">⚔️</div><div><h2>Online 1v1</h2><p>Δύο παίκτες. Δύο αγώνες. Ένας νικητής.</p></div></div>
+  <p class="subHelp">Φτιάξε δωμάτιο, στείλε τον 6ψήφιο κωδικό στον φίλο σου και αγωνιστείτε ταυτόχρονα.</p>
+  <div id="arenaSetup"><button id="createRoom" type="button" class="backPrimary">➕ Δημιουργία δωματίου</button><div class="roomDivider">ή μπες σε δωμάτιο φίλου</div><input id="roomCode" maxlength="6" placeholder="Κωδικός 6 χαρακτήρων" autocomplete="off"><button id="joinRoom" type="button" class="backPrimary secondaryAlt">🔗 Σύνδεση</button></div>
+  <p id="arenaStatus" aria-live="polite"></p><button id="arenaPlay" class="backPrimary" type="button" hidden>▶ Ξεκίνα αγώνα 1v1</button><button id="leaveRoom" class="secondaryAlt" type="button" hidden>🚪 Έξοδος από το δωμάτιο</button>
+</section>
+<section id="board" class="menuView subView" hidden>
+  <div class="subTop"><button class="backButton" type="button" data-back="homeView">← Πίσω</button><span class="subTag">HALL OF FAME ✦</span></div>
+  <div class="subHero"><div class="subSymbol">🏆</div><div><h2>Κατάταξη φίλων</h2><p>Οι καλύτεροι παίκτες του δάσους.</p></div></div>
+  <div id="scores"></div><p id="status" aria-live="polite"></p>
+</section>
+</main></div><script src="jelly_jump_web/config.js"></script><script>
+'use strict';const $=id=>document.getElementById(id),canvas=$('game'),ctx=canvas.getContext('2d'),overlay=$('overlay'),scoreText=$('score'),levelText=$('level'),message=$('message'),bestText=$('best'),start=$('start'),soundBtn=$('sound'),player=$('player'),scoresEl=$('scores'),statusEl=$('status');let W,H,dpr,ground,playing=false,dead=false,score=0,pipes=[],time=0,last=0,spawn=0,muted=localStorage.getItem('jj-muted')==='1',audio=null,musicTimer=0,noteIndex=0;const jelly={x:0,y:0,vy:0,r:23},notes=[392,523.25,587.33,523.25,440,523.25,659.25,523.25];let name=localStorage.getItem('jj-name')||'',localScores=JSON.parse(localStorage.getItem('jj-scores')||'[]');player.value=name;soundBtn.textContent=muted?'🔇 OFF':'🔊 ON';
+const SKINS=[
+ {id:'classic',label:'Classic',emoji:'💗',color:'#e47bdb',kind:'free',need:0},
+ {id:'fire',label:'Fire',emoji:'🔥',color:'#ff663d',kind:'points',need:5},
+ {id:'electric',label:'Electric',emoji:'⚡',color:'#73ef78',kind:'points',need:15},
+ {id:'galaxy',label:'Galaxy',emoji:'🌌',color:'#8a68f7',kind:'points',need:30},
+ {id:'gold',label:'Golden',emoji:'👑',color:'#ffd34d',kind:'best',need:20},
+ {id:'rainbow',label:'Rainbow',emoji:'🌈',color:'#58d9ee',kind:'best',need:35},
+ {id:'ice',label:'Ice',emoji:'❄️',color:'#71d8ff',kind:'points',need:20},
+ {id:'shadow',label:'Shadow',emoji:'🌑',color:'#6556a9',kind:'points',need:40},
+ {id:'nature',label:'Nature',emoji:'🌿',color:'#64d786',kind:'best',need:50},
+ {id:'neon',label:'Neon',emoji:'💜',color:'#e05dff',kind:'points',need:60},
+ {id:'crystal',label:'Crystal',emoji:'💎',color:'#88d8ff',kind:'best',need:60},
+ {id:'lava',label:'Lava',emoji:'🌋',color:'#fc632f',kind:'points',need:75},
+ {id:'angel',label:'Angel',emoji:'😇',color:'#fff1b7',kind:'best',need:75},
+ {id:'toxic',label:'Toxic',emoji:'☣️',color:'#a4f42a',kind:'points',need:100},
+ {id:'robot',label:'Robot',emoji:'🤖',color:'#7bb5e4',kind:'best',need:100},
+ {id:'pirate',label:'Pirate',emoji:'🏴‍☠️',color:'#ec9371',kind:'points',need:120},
+ {id:'candy',label:'Candy',emoji:'🍬',color:'#ff83b7',kind:'best',need:120},
+ {id:'ocean',label:'Ocean',emoji:'🌊',color:'#50bdec',kind:'points',need:150},
+ {id:'space',label:'Space',emoji:'🪐',color:'#8f7eff',kind:'best',need:150},
+ {id:'bubble',label:'Bubble',emoji:'🫧',color:'#9de5f1',kind:'points',need:200},
+ {id:'phoenix',label:'Phoenix',emoji:'🪽',color:'#ff814f',kind:'legend',points:250,best:25},
+ {id:'aurora',label:'Aurora',emoji:'🌈',color:'#65ddcc',kind:'legend',points:325,best:30},
+ {id:'royal',label:'Royal',emoji:'👑',color:'#e8a2ff',kind:'legend',points:450,best:40},
+ {id:'dragon',label:'Dragon',emoji:'🐲',color:'#7cf09b',kind:'legend',points:600,best:50},
+ {id:'cosmic',label:'Cosmic',emoji:'🌟',color:'#818bf9',kind:'legend',points:800,best:60},
+ {id:'mythic',label:'Mythic',emoji:'💠',color:'#ffd778',kind:'legend',points:1000,best:75}
+];
+const SHOP=[
+ {id:'stardust',label:'Αστρόσκονη',emoji:'🌠',price:25,caption:'Μαγική λάμψη'},
+ {id:'crown',label:'Κορώνα',emoji:'👑',price:45,caption:'Βασιλικό στυλ'},
+ {id:'spark',label:'Σπινθήρες',emoji:'⚡',price:70,caption:'Ηλεκτρική ενέργεια'},
+ {id:'halo',label:'Φωτοστέφανο',emoji:'😇',price:100,caption:'Αγγελική αύρα'}
+];
+const walletKey=n=>'jj-wallet:'+n.toLocaleLowerCase('el').trim();
+function wallet(n){try{const v=JSON.parse(localStorage.getItem(walletKey(n))||'{}');return {coins:Math.max(0,Number(v.coins)||0),owned:Array.isArray(v.owned)?v.owned:[],equipped:v.equipped||''}}catch(e){return {coins:0,owned:[],equipped:''}}}
+function saveWallet(n,v){localStorage.setItem(walletKey(n),JSON.stringify(v));$('coinCount').textContent=v.coins}
+function renderShop(){
+ const w=wallet(name),grid=$('shopGrid');$('coinCount').textContent=w.coins;
+ $('menuCoins').textContent=w.coins;$('profileCoinsValue').textContent=w.coins;
+ grid.replaceChildren();
+ for(const item of SHOP){
+  const owned=w.owned.includes(item.id),active=w.equipped===item.id;
+  const b=document.createElement('button');b.type='button';b.className='shopItem'+(active?' shopActive':'');
+  b.setAttribute('aria-label',`${item.label}, ${owned?(active?'Ενεργό':'Χρήση'):`${item.price} coins`}`);
+  const art=document.createElement('span');art.className='shopArt art-'+item.id;art.textContent=item.emoji;art.setAttribute('aria-hidden','true');
+  const info=document.createElement('span');info.className='shopCopy';
+  const title=document.createElement('strong');title.className='shopTitle';title.textContent=item.label;
+  const caption=document.createElement('small');caption.className='shopCaption';caption.textContent=item.caption;
+  const price=document.createElement('span');price.className='shopCost';price.textContent=owned?(active?'✓ Ενεργό':'✓ Αγορασμένο · Χρήση'):`🪙 ${item.price} coins`;
+  info.append(title,caption,price);b.append(art,info);
+  b.onclick=()=>{const a=wallet(name);if(!a.owned.includes(item.id)){
+    if(a.coins<item.price){alert('Χρειάζεσαι περισσότερα Jelly Coins!');return}
+    a.coins-=item.price;a.owned.push(item.id)
+   }a.equipped=a.equipped===item.id?'':item.id;saveWallet(name,a);renderShop()};
+  grid.append(b);
+ }
+}
+function rewardCoins(n,amount){if(!amount)return;const w=wallet(n);w.coins+=amount;saveWallet(n,w)}
+function showMenuView(id){for(const el of document.querySelectorAll('#panel .menuView'))el.hidden=el.id!==id;$('panel').scrollTop=0;if(id==='skinsPanel')renderSkins();if(id==='shopPanel')renderShop();if(id==='board')renderBoard();if(id==='profilePanel')updateMenuSummary();if(id==='worldsPanel')renderWorlds();if(id==='missionsPanel')renderMissions();}
+function togglePanel(id){showMenuView($(id).hidden?id:'homeView')}
+$('shopButton').onclick=()=>togglePanel('shopPanel');$('arenaButton').onclick=()=>togglePanel('arenaPanel');
+const progressKey=n=>'jj-skin-progress:'+n.toLocaleLowerCase('el').trim();
+const skinKey=n=>'jj-selected-skin:'+n.toLocaleLowerCase('el').trim();
+function readProgress(n){try{const p=JSON.parse(localStorage.getItem(progressKey(n))||'{}');return {points:Math.max(0,Number(p.points)||0),best:Math.max(0,Number(p.best)||0)}}catch(e){return {points:0,best:0}}}
+function earned(s,n){const p=readProgress(n),b=Math.max(p.best,n===name?best():0);return s.kind==='free'||(s.kind==='legend'?(p.points>=s.points&&b>=s.best):(s.kind==='points'?p.points>=s.need:b>=s.need))}
+function currentSkin(){const id=localStorage.getItem(skinKey(name))||'classic';return SKINS.find(s=>s.id===id&&earned(s,name))||SKINS[0]}
+function recordProgress(n,points){const p=readProgress(n);p.points+=points;p.best=Math.max(p.best,points);localStorage.setItem(progressKey(n),JSON.stringify(p))}
+function renderSkins(){
+ const grid=$('skinsGrid'),p=readProgress(name),current=currentSkin();grid.replaceChildren();
+ $('skinProgress').textContent=`${name||'Παίκτης'} • Συνολικοί πόντοι: ${p.points} • Καλύτερο σκορ: ${Math.max(p.best,best())} • ${SKINS.filter(s=>earned(s,name)).length}/${SKINS.length} Jelly`;
+ for(const skin of SKINS){
+  const unlocked=earned(skin,name),selected=current.id===skin.id;
+  const b=document.createElement('button');b.type='button';
+  b.className='skin-card'+(unlocked?'':' locked')+(selected?' selected':'')+(skin.kind==='legend'?' legendarySkin':'');
+  b.setAttribute('aria-label',`${skin.label}, ${unlocked?(selected?'επιλεγμένο':'διαθέσιμο'):(skin.kind==='legend'?`Legendary: ${skin.points} πόντοι και ρεκόρ ${skin.best}`:(skin.kind==='points'?`ξεκλειδώνει στους ${skin.need} συνολικούς πόντους`:`ξεκλειδώνει με ρεκόρ ${skin.need}`))}`);
+  const frame=document.createElement('span');frame.className='skinPortrait';
+  const portrait=document.createElement('canvas');portrait.className='skinPortraitCanvas';portrait.width=180;portrait.height=170;
+  portrait.setAttribute('aria-hidden','true');frame.append(portrait);
+  const title=document.createElement('strong');title.className='skinName';title.textContent=skin.label;
+  const hint=document.createElement('span');hint.className='skin-info';
+  hint.textContent=unlocked?(selected?'✓ Επιλεγμένο':'✨ Επιλογή'):(skin.kind==='legend'?`${skin.points} πόντοι + ρεκόρ ${skin.best}`:(skin.kind==='points'?`${skin.need} συνολικοί πόντοι`:`Ρεκόρ ${skin.need}`));
+  b.append(frame,title,hint);if(skin.kind==='legend'){const badge=document.createElement('span');badge.className='legendPill';badge.textContent='LEGENDARY';b.append(badge)}
+  if(!unlocked){
+   const bar=document.createElement('span');bar.className='skinUnlockTrack';const fill=document.createElement('span');fill.className='skinUnlockFill';
+   const reached=skin.kind==='points'?p.points:Math.max(p.best,best());fill.style.width=skin.kind==='legend'?Math.min(100,100*Math.min(p.points/skin.points,Math.max(p.best,best())/skin.best))+'%':Math.min(100,100*reached/skin.need)+'%';bar.append(fill);b.append(bar)
+  }
+  b.disabled=!unlocked;
+  b.addEventListener('click',()=>{localStorage.setItem(skinKey(name),skin.id);renderSkins();updateMenuSummary()});
+  grid.append(b);
+  const pctx=portrait.getContext('2d');pctx.setTransform(2.08,0,0,2.08,90,100);paintJellyFigure(pctx,skin,0);
+ }
+}
+$('skinsButton').addEventListener('click',()=>togglePanel('skinsPanel'));
+
+// WILD BLOOM LEGENDS — Five real backgrounds, dedicated unlock progress per player.
+const WORLDS=[
+ {id:'forest',label:'Μαγεμένο Δάσος',icon:'🌳',desc:'Η αρχική Wild Bloom περιπέτεια',need:0,bg:'linear-gradient(145deg,#7acda7,#1c7865 56%,#174259)'},
+ {id:'frost',label:'Παγωμένο Βασίλειο',icon:'❄️',desc:'Κρύσταλλοι, χιόνι και παγετώνες',need:20,bg:'linear-gradient(145deg,#80e6ff,#6d9de1 58%,#284b9c)'},
+ {id:'volcano',label:'Ηφαίστειο',icon:'🌋',desc:'Λάβα, σπινθήρες και σκοτεινοί βράχοι',need:55,bg:'linear-gradient(145deg,#f9a04c,#b63e50 52%,#332c53)'},
+ {id:'ocean',label:'Κοραλλένιος Κόλπος',icon:'🐠',desc:'Γαλαζοπράσινες θάλασσες και κοράλλια',need:90,bg:'linear-gradient(145deg,#5df5cb,#1695c2 53%,#1f4e93)'},
+ {id:'stars',label:'Αστρικό Όνειρο',icon:'🌌',desc:'Πλανήτες, άστρα και μαγικό φως',need:160,bg:'linear-gradient(145deg,#ad8cef,#4244a6 45%,#131c55)'}
+];
+const worldKey=n=>'jj-world:'+n.toLocaleLowerCase('el').trim();
+function currentWorld(){const id=localStorage.getItem(worldKey(name))||'forest';const w=WORLDS.find(x=>x.id===id)||WORLDS[0];return readProgress(name).points>=w.need?w:WORLDS[0]}
+function renderWorlds(){const grid=$('worldsGrid'),p=readProgress(name);grid.replaceChildren();$('worldProgress').textContent=`${name||'Παίκτης'} • ${p.points} συνολικοί πόντοι • ${WORLDS.filter(w=>p.points>=w.need).length}/${WORLDS.length} κόσμοι διαθέσιμοι`;
+ for(const w of WORLDS){const available=p.points>=w.need,active=currentWorld().id===w.id;
+  const b=document.createElement('button');b.type='button';b.className='worldCard'+(active?' selected':'')+(available?'':' locked');b.style.setProperty('--world-bg',w.bg);b.disabled=!available;
+  b.setAttribute('aria-label',w.label+(available?(active?', επιλεγμένος':' , διαθέσιμος'):` , χρειάζονται ${w.need} συνολικοί πόντοι`));
+  const icon=document.createElement('span');icon.className='worldIcon';icon.textContent=w.icon;
+  const title=document.createElement('span');title.className='worldTitle';title.textContent=w.label;
+  const desc=document.createElement('span');desc.className='worldDesc';desc.textContent=w.desc;
+  const unlock=document.createElement('span');unlock.className='worldUnlock';unlock.textContent=available?(active?'✓ ΕΠΙΛΕΓΜΕΝΟΣ':'✨ ΕΠΙΛΟΓΗ'):`🔒 ${w.need} συνολικοί πόντοι`;
+  b.append(icon,title,desc,unlock);b.onclick=()=>{localStorage.setItem(worldKey(name),w.id);landscape.blades=[];wild.initialized=false;renderWorlds();beep(610,.1)};grid.append(b);
+ }
+}
+// Daily quests: fixed daily rotation; per-player and per-device, no backend schema changes.
+const QUEST_TEMPLATES=[
+ {id:'jumps',icon:'🦘',title:'Μαγικά άλματα',unit:'άλματα',goal:15,reward:12},
+ {id:'runs',icon:'🎮',title:'Παίξε αγώνες',unit:'αγώνες',goal:3,reward:16},
+ {id:'points',icon:'🏆',title:'Συγκέντρωσε πόντους',unit:'πόντους',goal:20,reward:20},
+ {id:'pickups',icon:'✨',title:'Μάζεψε power-ups',unit:'ενισχύσεις',goal:2,reward:20},
+ {id:'coins',icon:'🪙',title:'Μάζεψε Coins',unit:'coins',goal:25,reward:18}
+];
+function dayId(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+const missionKey=n=>'jj-daily:'+n.toLocaleLowerCase('el').trim()+':'+dayId();
+function dailyQuests(){const n=Number(dayId().replace(/-/g,''));return [0,1,2].map((_,i)=>QUEST_TEMPLATES[(n+i*2)%QUEST_TEMPLATES.length])}
+function loadMissions(n){try{const v=JSON.parse(localStorage.getItem(missionKey(n))||'{}');return {counts:v.counts&&typeof v.counts==='object'?v.counts:{},claimed:Array.isArray(v.claimed)?v.claimed:[]}}catch(e){return {counts:{},claimed:[]}}}
+function saveMissions(n,v){localStorage.setItem(missionKey(n),JSON.stringify(v))}
+function missionEvent(kind,amount=1){if(!name||!amount||room)return;const q=dailyQuests();if(!q.some(x=>x.id===kind))return;const m=loadMissions(name);m.counts[kind]=Math.max(0,(Number(m.counts[kind])||0)+amount);saveMissions(name,m)}
+function renderMissions(){const grid=$('missionsGrid');grid.replaceChildren();$('missionDate').textContent='📅 '+new Intl.DateTimeFormat('el-GR',{dateStyle:'full'}).format(new Date());const m=loadMissions(name);
+ for(const q of dailyQuests()){const count=Math.min(q.goal,Number(m.counts[q.id])||0),claimed=m.claimed.includes(q.id),ready=count>=q.goal;
+  const card=document.createElement('div');card.className='missionCard';
+  const icon=document.createElement('span');icon.className='missionIcon';icon.textContent=q.icon;
+  const info=document.createElement('div');info.className='missionInfo';const title=document.createElement('strong');title.textContent=q.title;const details=document.createElement('small');details.textContent=`${count}/${q.goal} ${q.unit} • +${q.reward} 🪙`;
+  const bar=document.createElement('span');bar.className='missionBar';const fill=document.createElement('span');fill.style.width=(100*count/q.goal)+'%';bar.append(fill);info.append(title,details,bar);
+  const claim=document.createElement('button');claim.type='button';claim.className='missionClaim';claim.textContent=claimed?'✓ Δόθηκε':ready?'🎁 Πάρε δώρο':'🔒 Συνέχισε';claim.disabled=claimed||!ready;
+  claim.onclick=()=>{const state=loadMissions(name);if(state.claimed.includes(q.id)||(Number(state.counts[q.id])||0)<q.goal)return;state.claimed.push(q.id);saveMissions(name,state);rewardCoins(name,q.reward);updateMenuSummary();renderMissions();showWildToast(`🎁 +${q.reward} Coins!`)};
+  card.append(icon,info,claim);grid.append(card);
+ }
+}
+$('worldsButton').onclick=()=>showMenuView('worldsPanel');
+$('missionsButton').onclick=()=>showMenuView('missionsPanel');
+// Temporary boosts are limited to unranked solo attempts. They never change Supabase scores or 1v1.
+const POWER_TYPES=[{id:'shield',icon:'🛡️',label:'Ασπίδα',color:'#88eeef'},
+ {id:'boost',icon:'🚀',label:'Super Jump',color:'#ffe7a2'},
+ {id:'slow',icon:'⏳',label:'Slow Motion',color:'#b8c5ff'},
+ {id:'magnet',icon:'🧲',label:'Coin Magnet',color:'#f7aeff'}];
+const powerState={shield:0,boost:0,slow:0,magnet:0};let runAssisted=false,obstacleNumber=0,powerHudTimer=0;
+function clearPowers(){for(const p of POWER_TYPES)powerState[p.id]=0;runAssisted=false;obstacleNumber=0;$('powerHud').hidden=true}
+function activatePower(id){if(room)return;runAssisted=true;powerState[id]=id==='shield'?1:id==='boost'?650:id==='slow'?480:650;missionEvent('pickups');const p=POWER_TYPES.find(x=>x.id===id);emitWild(jelly.x,jelly.y,35,p.color,1.6);showWildToast(p.icon+' '+p.label.toUpperCase()+'!');beep(900,.15,.06);updatePowerHud()}
+function updatePowerHud(){if(!playing){$('powerHud').hidden=true;return}const active=POWER_TYPES.filter(p=>powerState[p.id]>0);$('powerHud').hidden=!active.length;$('powerHud').textContent=active.map(p=>p.icon+' '+(p.id==='shield'?'1 φορά':Math.ceil(powerState[p.id]/60)+'s')).join('  ')}
+function tickPowers(dt){for(const p of POWER_TYPES)if(p.id!=='shield')powerState[p.id]=Math.max(0,powerState[p.id]-dt);if(++powerHudTimer%12===0)updatePowerHud()}
+function saveHit(){if(!powerState.shield)return false;powerState.shield=0;wild.shake=4;emitWild(jelly.x,jelly.y,20,'#c8fffd',1.3);showWildToast('🛡️ Η ΑΣΠΙΔΑ ΣΕ ΕΣΩΣΕ!');beep(420,.2);updatePowerHud();return true}
+function collectible(x,y,icon,color,t){ctx.save();ctx.translate(x,y+Math.sin(time*.075+t)*6);ctx.shadowColor=color;ctx.shadowBlur=18;ctx.fillStyle='#1a3b56ba';ctx.beginPath();ctx.arc(0,0,18,0,Math.PI*2);ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();ctx.font='23px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(icon,0,1);ctx.restore()}
+function handlePickups(p){if(room)return;const x=p.x+34,y=p.top+p.gap*.5,dist=Math.hypot(x-jelly.x,y-jelly.y);
+ if(p.coin&&!p.coinTaken){collectible(x,y-22,'🪙','#ffe9a2',1);if(dist<(powerState.magnet>0?130:30)){p.coinTaken=true;rewardCoins(name,1);missionEvent('coins');emitWild(x,y-22,8,'#ffe59d');beep(700,.055)}}
+ if(p.pickup&&!p.pickupTaken){const info=POWER_TYPES.find(a=>a.id===p.pickup);collectible(x,y+23,info.icon,info.color,3);if(Math.hypot(x-jelly.x,y+23-jelly.y)<29){p.pickupTaken=true;activatePower(p.pickup)}}
+}
+// Draw different landscape paintings while retaining the original forest as-is.
+const WORLD_PALETTES={
+ frost:{sky:['#132e69','#659cd8','#e5effb'],ridge:['#b7d9ed','#8bbce5','#5979aa'],earth:['#e1f5fb','#8dc7e8','#335d93'],obstacle:['#d4f5fc','#61a8d7','#315e9e'],glow:'#f9ffff'},
+ volcano:{sky:['#29162c','#93434c','#efa65a'],ridge:['#814258','#642c3e','#482839'],earth:['#f4a85e','#9d453b','#3a283b'],obstacle:['#49313f','#bd4a38','#46233c'],glow:'#ffe19f'},
+ ocean:{sky:['#0f6e99','#71dbd6','#c9f3df'],ridge:['#75c5bd','#4aa5ae','#267b9f'],earth:['#b5e9bc','#70b7ac','#246a85'],obstacle:['#ffb39d','#e67b97','#875f9a'],glow:'#b7fff2'},
+ stars:{sky:['#060c29','#1f2968','#50468b'],ridge:['#4b4a99','#35377d','#21275e'],earth:['#7566b9','#3b4789','#181f55'],obstacle:['#a1a2ee','#726ed4','#30347e'],glow:'#edc6ff'}
+};
+function realmBackground(){const id=currentWorld().id,p=WORLD_PALETTES[id];if(!p)return;
+ const sky=ctx.createLinearGradient(0,0,0,ground);sky.addColorStop(0,p.sky[0]);sky.addColorStop(.55,p.sky[1]);sky.addColorStop(1,p.sky[2]);ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ const sunx=W*.77,suny=H*.22;
+ if(id==='stars'){for(let i=0;i<85;i++){const x=((i*211.7-time*.12*(i%3+1))%(W+100)+(W+100))%(W+100)-50,y=(i*97.13)%(Math.max(110,ground-45));ctx.fillStyle=i%3?'#fbf1ffbd':'#d4ccff';ctx.globalAlpha=.3+.6*Math.abs(Math.sin(time*.017+i));ctx.beginPath();ctx.arc(x,y,i%13===0?2:1,0,7);ctx.fill()}ctx.globalAlpha=1;orb(sunx,suny,102,[[0,'#c8b2ff9e'],[.35,'#8a79ff54'],[1,'#5d64ff00']]);ctx.fillStyle='#ddd2ff';ctx.beginPath();ctx.arc(sunx,suny,32,0,7);ctx.fill();ctx.strokeStyle='#e1baffaf';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(sunx,suny,54,13,-.27,0,7);ctx.stroke()}
+ else if(id==='volcano'){orb(sunx,suny,165,[[0,'#ff8f4b7e'],[.55,'#e9684543'],[1,'#ff985500']]);ctx.fillStyle='#ffbc6a';ctx.beginPath();ctx.arc(sunx,suny,29,0,7);ctx.fill()}
+ else {orb(sunx,suny,155,[[0,id==='frost'?'#f5ffffa7':'#e6fff7aa'],[.52,'#d5ffff32'],[1,'#e6ffff00']]);ctx.fillStyle='#f8ffffdb';ctx.beginPath();ctx.arc(sunx,suny,22,0,7);ctx.fill()}
+ shapeHill(ground-180,31,165,.06,p.ridge[0]);shapeHill(ground-120,37,120,.13,p.ridge[1]);shapeHill(ground-71,25,80,.24,p.ridge[2]);
+ for(let i=0;i<Math.ceil(W/86)+3;i++){const x=((i*91-time*.25)%(W+150)+(W+150))%(W+150)-70,y=ground-27;
+  if(id==='frost'){ctx.fillStyle=i%2?'#e1f5ffb0':'#b6e5f9c9';ctx.beginPath();ctx.moveTo(x-25,y);ctx.lineTo(x,y-72-(i%3)*16);ctx.lineTo(x+27,y);ctx.closePath();ctx.fill();ctx.fillStyle='#ffffffaa';ctx.beginPath();ctx.moveTo(x-9,y-44);ctx.lineTo(x,y-72-(i%3)*16);ctx.lineTo(x+10,y-44);ctx.closePath();ctx.fill()}
+  if(id==='volcano'){ctx.fillStyle='#2c2138b8';ctx.beginPath();ctx.moveTo(x-29,y);ctx.lineTo(x-4,y-68-(i%3)*26);ctx.lineTo(x+15,y-45);ctx.lineTo(x+30,y);ctx.fill();ctx.fillStyle='#f77e3f';ctx.beginPath();ctx.moveTo(x-6,y-58-(i%3)*17);ctx.lineTo(x-2,y-20);ctx.lineTo(x+5,y-51);ctx.closePath();ctx.fill()}
+  if(id==='ocean'){ctx.strokeStyle=i%2?'#a0f4d9':'#f9afc7';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x,y+4);ctx.lineTo(x,y-38);ctx.moveTo(x,y-26);ctx.quadraticCurveTo(x-13,y-31,x-17,y-48);ctx.moveTo(x,y-15);ctx.quadraticCurveTo(x+13,y-26,x+17,y-39);ctx.stroke()}
+  if(id==='stars'){ctx.fillStyle='#95a2ef78';ctx.beginPath();ctx.moveTo(x-23,y);ctx.lineTo(x-10,y-66);ctx.lineTo(x+1,y-51);ctx.lineTo(x+12,y-85);ctx.lineTo(x+27,y);ctx.fill()}
+ }
+ const soil=ctx.createLinearGradient(0,ground-11,0,H);soil.addColorStop(0,p.earth[0]);soil.addColorStop(.35,p.earth[1]);soil.addColorStop(1,p.earth[2]);ctx.fillStyle=soil;ctx.fillRect(0,ground-7,W,H-ground+7);
+ ctx.fillStyle=id==='volcano'?'#ffb75caa':id==='frost'?'#ffffff9e':id==='stars'?'#c7acff99':'#7ef5c8aa';ctx.fillRect(0,ground-7,W,7);
+ for(let i=0;i<(wild.quality==='ultra'?67:23);i++){const x=((i*69.6-time*(id==='stars'?.08:.4))%(W+90)+(W+90))%(W+90)-45,y=(i*31.1)%(Math.max(90,ground-20));const blink=.22+.58*Math.abs(Math.sin(time*.024+i*13));ctx.globalAlpha=blink;ctx.fillStyle=p.glow;ctx.beginPath();ctx.arc(x,y,id==='ocean'?2.6:1.4,0,7);ctx.fill()}ctx.globalAlpha=1;
+ const vign=ctx.createRadialGradient(W*.5,H*.4,Math.min(W,H)*.24,W*.5,H*.4,Math.max(W,H)*.8);vign.addColorStop(0,'#0000');vign.addColorStop(1,'#09132a6b');ctx.fillStyle=vign;ctx.fillRect(0,0,W,H);
+}
+function realmPillar(x,y,h,id){if(h<=0)return;const p=WORLD_PALETTES[id],g=ctx.createLinearGradient(x,y,x+68,y);g.addColorStop(0,p.obstacle[2]);g.addColorStop(.38,p.obstacle[0]);g.addColorStop(.76,p.obstacle[1]);g.addColorStop(1,p.obstacle[2]);ctx.fillStyle=g;
+ ctx.beginPath();ctx.moveTo(x+6,y);ctx.lineTo(x+62,y);ctx.lineTo(x+68,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();ctx.strokeStyle=p.obstacle[0];ctx.lineWidth=2;ctx.stroke();
+ const visibleStart=Math.max(y,-2),visibleEnd=Math.min(y+h,ground+1);for(let yy=visibleStart+9;yy<visibleEnd;yy+=21){ctx.fillStyle=id==='volcano'?'#ff9b4b9a':id==='frost'?'#e7ffff86':id==='ocean'?'#ffd2ba9c':'#ccbbff99';ctx.beginPath();ctx.moveTo(x+14,yy);ctx.lineTo(x+32,yy-7);ctx.lineTo(x+26,yy+11);ctx.closePath();ctx.fill()}
+}
+
+const cfg=window.JELLY_CONFIG||{},online=Boolean(cfg.supabaseUrl&&cfg.supabaseAnonKey);function safeName(s){return s.trim().replace(/\s+/g,' ').slice(0,18)}function best(){return Math.max(0,...localScores.filter(r=>(r.player_name??r.name)===name).map(r=>Number(r.score)||0))}function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ground=H-70;jelly.x=Math.min(W*.27,140);if(!playing)jelly.y=H*.43}addEventListener('resize',()=>{landscape.blades=[];wild.initialized=false;resize()});resize();function level(){return 1+Math.floor(score/5)}function speed(){return Math.min(5.3,2.65+(level()-1)*.32)}function gapSize(){return Math.max(126,Math.min(205,H*.26)-(level()-1)*7)}function reset(){if(room&&!room.started){alert('Περίμενε να μπουν και οι δύο παίκτες!');return}if(room&&room.finished){alert('Ο αγώνας ολοκληρώθηκε. Φτιάξε νέο δωμάτιο.');return}if(room){room.localScore=0;room.runActive=true;sendArenaScore(0,false)}pipes=[];clearPowers();wild.particles=[];wild.shake=0;score=0;spawn=0;time=0;dead=false;playing=true;document.body.classList.add('is-playing');jelly.y=H*.42;jelly.vy=-4;scoreText.textContent='0';levelText.textContent='ΕΠΙΠΕΔΟ 1';overlay.style.display='none';missionEvent('runs');initAudio()}function initAudio(){if(muted)return;try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume()}catch(e){}}function beep(freq,dur=.08,vol=.035,type='sine'){if(muted||!audio)return;try{const o=audio.createOscillator(),g=audio.createGain(),now=audio.currentTime;o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(.001,now+dur);o.connect(g);g.connect(audio.destination);o.start(now);o.stop(now+dur+.01)}catch(e){}}function jump(){if(!playing)return;missionEvent('jumps');jelly.vy=powerState.boost>0?-8.3:-5.9;emitWild(jelly.x-12,jelly.y+15,9,currentSkin().color,.65);beep(520,.07)}function finish(){if(dead)return;dead=true;playing=false;updatePowerHud();document.body.classList.remove('is-playing');wild.shake=9;emitWild(jelly.x,jelly.y,42,'#fff2b0',2);if(score>best())showWildToast('🏆 ΝΕΟ ΡΕΚΟΡ!');beep(170,.23,.07,'triangle');localScores.push({player_name:name,score,date:Date.now()});localScores.sort((a,b)=>b.score-a.score);localScores=localScores.slice(0,100);localStorage.setItem('jj-scores',JSON.stringify(localScores));recordProgress(name,score);missionEvent('coins',score);rewardCoins(name,score);if(room)endArenaRun(score);if(!$('skinsPanel').hidden)renderSkins();message.textContent=`${name}: ${score} πόντοι! `+(runAssisted?'⚡ Αγώνας με δυνάμεις — δεν προσμετράται στην online κατάταξη.':'Έτοιμος για την επόμενη περιπέτεια;');bestText.textContent='🏆 Προσωπικό ρεκόρ: '+best();$('playText').textContent='ΞΑΝΑΠΑΙΞΕ';updateMenuSummary();showMenuView('homeView');overlay.style.display='flex';renderBoard();if(online&&score>0&&!runAssisted)submitScore(name,score).then(renderBoard).catch(()=>{statusEl.textContent='Το σκορ κρατήθηκε στη συσκευή, αλλά δεν στάλθηκε online.'})}function drawBarkPillar(x,y,h,isBottom){if(h<=0)return;const width=68;
+ ctx.save();
+ const bark=ctx.createLinearGradient(x,0,x+width,0);bark.addColorStop(0,'#314b42');bark.addColorStop(.15,'#6d7762');bark.addColorStop(.39,'#8a8168');bark.addColorStop(.68,'#4d6254');bark.addColorStop(1,'#243f39');ctx.fillStyle=bark;
+ ctx.beginPath();ctx.moveTo(x+8,y);ctx.lineTo(x+width-8,y);ctx.quadraticCurveTo(x+width+1,y+h*.31,x+width-3,y+h*.67);ctx.lineTo(x+width,y+h);ctx.lineTo(x,y+h);ctx.quadraticCurveTo(x-4,y+h*.52,x+4,y+h*.28);ctx.closePath();ctx.fill();
+ ctx.globalAlpha=.48;for(let i=0;i<8;i++){const q=x+8+(i*11)%55;ctx.strokeStyle=i%2?'#213d3d':'#b5a98c';ctx.lineWidth=i%3===0?2.8:1.5;ctx.beginPath();ctx.moveTo(q,y+4);for(let yy=y+9;yy<y+h;yy+=29)ctx.lineTo(q+Math.sin(yy*.11+i)*3,yy);ctx.stroke()}ctx.globalAlpha=1;
+ const lip=isBottom?y:y+h-15;const moss=ctx.createLinearGradient(0,lip,0,lip+22);moss.addColorStop(0,'#2d7959');moss.addColorStop(.5,'#6cbf6c');moss.addColorStop(1,'#264d46');ctx.fillStyle=moss;
+ ctx.beginPath();ctx.moveTo(x-4,lip+4);for(let i=0;i<=9;i++){const bx=x-5+i*9;ctx.lineTo(bx,lip+Math.sin(i*2.7+time*.02)*3+(i%3)*1.5)}ctx.lineTo(x+72,lip+18);ctx.lineTo(x-5,lip+18);ctx.closePath();ctx.fill();
+ for(let k=0;k<7;k++){const xx=x+5+k*9,yy=isBottom?y+5:y+h-8;ctx.strokeStyle=k%2?'#9bdf78':'#4aab63';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(xx,yy);ctx.quadraticCurveTo(xx+Math.sin(time*.032+k)*3,yy+(isBottom?-8:7),xx+Math.sin(time*.032+k)*5,yy+(isBottom?-15:13));ctx.stroke()}
+ // Tiny wild leaves around the open tips.
+ ctx.fillStyle='#8cce67';for(let k=0;k<3;k++){const a=x+10+k*22;const by=isBottom?y+8:y+h-7;ctx.beginPath();ctx.ellipse(a,by,5,2.5,k*.6,0,7);ctx.fill()}
+ ctx.restore()}
+function pipe(x,top,gap){const w=currentWorld().id;if(w==='forest'){drawBarkPillar(x,-4,top+4,false);drawBarkPillar(x,top+gap,ground-(top+gap),true)}else{realmPillar(x,-4,top+4,w);realmPillar(x,top+gap,ground-(top+gap),w)}}
+// Shared vector renderer: the store/skin miniatures show the same Jelly as the character in-game.
+function tintHex(hex,amount){const n=parseInt(hex.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+ const channel=v=>Math.max(0,Math.min(255,Math.round(amount>=0?v+(255-v)*amount:v*(1+amount))));
+ return '#'+[channel(r),channel(g),channel(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}
+function paintJellyFigure(g,skin,tick){
+ const id=skin.id,c=skin.color;
+ g.save();
+ const aura=g.createRadialGradient(0,0,2,0,0,49);
+ aura.addColorStop(0,'#ffffff00');aura.addColorStop(.57,c+'55');aura.addColorStop(1,c+'00');g.fillStyle=aura;g.beginPath();g.arc(0,0,49,0,Math.PI*2);g.fill();
+ g.shadowColor=c;g.shadowBlur=id==='neon'?30:18;
+ const gr=g.createRadialGradient(-11,-17,0,1,2,36);
+ gr.addColorStop(0,'#ffffff');gr.addColorStop(.24,tintHex(c,.65));gr.addColorStop(.68,c);gr.addColorStop(1,tintHex(c,-.48));
+ g.fillStyle=gr;g.beginPath();g.moveTo(-24,8);g.bezierCurveTo(-29,-11,-20,-26,-3,-27);g.bezierCurveTo(16,-31,30,-13,25,11);g.bezierCurveTo(23,25,11,29,-4,27);g.bezierCurveTo(-20,27,-27,23,-24,8);g.closePath();g.fill();g.shadowBlur=0;
+ // Themed material treatments on the same Jelly silhouette.
+ g.save();g.beginPath();g.moveTo(-24,8);g.bezierCurveTo(-29,-11,-20,-26,-3,-27);g.bezierCurveTo(16,-31,30,-13,25,11);g.bezierCurveTo(23,25,11,29,-4,27);g.bezierCurveTo(-20,27,-27,23,-24,8);g.closePath();g.clip();
+ if(id==='rainbow'||id==='candy'){
+  const stripe=g.createLinearGradient(-26,0,27,0);
+  const colors=id==='rainbow'?['#ff6989','#ffce64','#9bf883','#80e2f9','#bd8cff']:['#ff75b2','#fff6ce','#ff5e9d','#fff6ce','#ff91b8'];
+  colors.forEach((v,i)=>stripe.addColorStop(i/(colors.length-1),v));g.globalAlpha=.57;g.fillStyle=stripe;g.fillRect(-28,-30,56,65);g.globalAlpha=1;
+ }
+ if(id==='crystal'||id==='ice'){
+  g.fillStyle='#ffffff28';g.beginPath();g.moveTo(-25,-4);g.lineTo(-2,-27);g.lineTo(12,-23);g.lineTo(-9,13);g.closePath();g.fill();
+  g.fillStyle='#c4f5ff75';g.beginPath();g.moveTo(12,-23);g.lineTo(26,8);g.lineTo(1,24);g.closePath();g.fill();
+ }
+ if(id==='robot'){
+  g.fillStyle='#ffffff35';g.fillRect(-28,2,56,11);g.strokeStyle='#f0f8ff80';g.lineWidth=1.4;g.strokeRect(-22,-17,44,34);
+ }
+ if(id==='lava'){
+  g.strokeStyle='#ffce46';g.lineWidth=4;g.beginPath();g.moveTo(-24,11);g.lineTo(-9,6);g.lineTo(-5,23);g.moveTo(2,-26);g.lineTo(4,-11);g.lineTo(21,3);g.stroke();
+ }
+ if(id==='galaxy'||id==='space'||id==='shadow'){
+  for(let i=0;i<12;i++){let px=Math.sin(i*7.3)*19,py=Math.cos(i*4.6)*21;g.fillStyle=i%3?'#ffffffbd':'#ffe19c';g.beginPath();g.arc(px,py,i%4?1:1.8,0,7);g.fill()}
+ }
+ if(id==='ocean'||id==='bubble'){
+  g.strokeStyle='#ffffff91';g.lineWidth=1.6;for(let i=0;i<4;i++){const px=-16+i*10,py=12-(i%2)*8;g.beginPath();g.arc(px,py,3+(i%3),0,7);g.stroke()}
+ }
+ if(['phoenix','aurora','royal','dragon','cosmic','mythic'].includes(id)){
+  const palette={phoenix:['#ffcb4a','#f44a3e'],aurora:['#a8ffcf','#a580ff'],royal:['#f8ca7d','#c67cff'],dragon:['#7ffc95','#31b88c'],cosmic:['#a9b8ff','#663fea'],mythic:['#fff0ae','#f7b95b']}[id];
+  g.globalAlpha=.72;for(let i=0;i<4;i++){g.strokeStyle=palette[i%2];g.lineWidth=2.2;g.beginPath();g.moveTo(-24+i*13,-20);g.quadraticCurveTo(-12+i*13,-4,-22+i*14,26);g.stroke()}g.globalAlpha=1;
+ }
+ if(id==='toxic'){g.fillStyle='#265a16bd';for(let i=0;i<4;i++){g.beginPath();g.arc(-20+i*13,18+(i%2)*4,4,0,7);g.fill()}}
+ if(id==='nature'){g.strokeStyle='#dcffaf91';g.lineWidth=2.5;g.beginPath();g.moveTo(-21,10);g.quadraticCurveTo(-10,-8,5,-20);g.stroke()}
+ g.restore();
+ g.strokeStyle='#ffffffe2';g.lineWidth=2.0;g.beginPath();g.moveTo(-19,12);g.bezierCurveTo(-27,-8,-18,-23,0,-25);g.stroke();
+ g.fillStyle='#ffffffb0';g.beginPath();g.ellipse(-11,-16,8,3.6,-.4,0,7);g.fill();
+ g.fillStyle='#ffffff8b';g.beginPath();g.ellipse(13,12,3,5.5,-.6,0,7);g.fill();
+ // Eyes and expressions are drawn directly into the Jelly rather than being generic icons.
+ for(const ox of [-8,9]){
+  g.fillStyle='#fffefa';g.beginPath();g.ellipse(ox,-6,6.2,8.1,0,0,7);g.fill();
+  g.fillStyle=id==='robot'?'#1674a8':id==='shadow'?'#9d50fa':'#263447';g.beginPath();g.ellipse(ox+1,-4.5,3.2,4.1,0,0,7);g.fill();
+  g.fillStyle='#fff';g.beginPath();g.arc(ox,-7,1.4,0,7);g.fill();
+ }
+ g.strokeStyle=id==='shadow'?'#e0b9fb':'#713f69';g.lineWidth=2.4;g.lineCap='round';g.beginPath();g.arc(1,4,5,.15,Math.PI-.14);g.stroke();
+ g.fillStyle='#ff8dbb73';g.beginPath();g.ellipse(-17,5,4,2,0,0,7);g.ellipse(17,5,4,2,0,0,7);g.fill();
+ // These details are part of the skin both in the menu preview and during play.
+ if(id==='angel'){
+  g.strokeStyle='#fff5a5';g.lineWidth=3;g.shadowColor='#ffef7d';g.shadowBlur=9;g.beginPath();g.ellipse(0,-40,18,4,0,0,7);g.stroke();g.shadowBlur=0;
+  g.fillStyle='#f9ffffe5';g.beginPath();g.ellipse(-26,3,10,17,.7,0,7);g.ellipse(26,3,10,17,-.7,0,7);g.fill();
+ }else if(id==='pirate'){
+  g.fillStyle='#243349';g.beginPath();g.moveTo(-26,-23);g.quadraticCurveTo(0,-44,27,-23);g.lineTo(19,-16);g.lineTo(-21,-16);g.closePath();g.fill();
+  g.strokeStyle='#ffdc91';g.lineWidth=2.4;g.beginPath();g.moveTo(-29,-19);g.lineTo(28,-19);g.stroke();g.font='13px system-ui';g.textAlign='center';g.fillStyle='#fff';g.fillText('☠',0,-24);
+ }else if(id==='robot'){
+  g.strokeStyle='#bccfe8';g.lineWidth=3;g.beginPath();g.moveTo(0,-27);g.lineTo(0,-40);g.stroke();g.fillStyle='#ff6589';g.beginPath();g.arc(0,-43,4,0,7);g.fill();
+ }else if(id==='nature'){
+  g.fillStyle='#3ca453';g.beginPath();g.ellipse(-7,-33,11,5,-.4,0,7);g.ellipse(9,-36,10,5,.55,0,7);g.fill();
+ }else if(id==='neon'){
+  g.shadowColor='#ff39f2';g.shadowBlur=12;g.strokeStyle='#ffb3fe';g.lineWidth=2;g.beginPath();g.arc(0,0,28,0,7);g.stroke();g.shadowBlur=0;
+ }else if(['phoenix','aurora','royal','dragon','cosmic','mythic'].includes(id)){
+  const col={phoenix:'#ffe17c',aurora:'#b8fff3',royal:'#f5d48d',dragon:'#9efcad',cosmic:'#b5adff',mythic:'#fff2a0'}[id];
+  g.shadowColor=col;g.shadowBlur=17;g.strokeStyle=col;g.lineWidth=2.6;
+  g.beginPath();g.moveTo(-28,4);g.quadraticCurveTo(-43,-16,-37,-27);g.quadraticCurveTo(-20,-24,-21,-8);g.moveTo(28,4);g.quadraticCurveTo(43,-16,37,-27);g.quadraticCurveTo(20,-24,21,-8);g.stroke();g.shadowBlur=0;
+  if(id==='royal'||id==='mythic'){g.textAlign='center';g.font='25px system-ui';g.fillText('👑',0,-40)}
+  if(id==='dragon'){g.fillStyle=col;g.beginPath();g.moveTo(-18,-27);g.lineTo(-12,-43);g.lineTo(-4,-26);g.moveTo(9,-27);g.lineTo(18,-44);g.lineTo(21,-24);g.fill()}
+  if(id==='phoenix'){g.fillStyle='#ffde76';g.beginPath();g.moveTo(0,-26);g.quadraticCurveTo(-13,-44,-1,-51);g.quadraticCurveTo(12,-39,7,-28);g.fill()}
+ }else if(id==='toxic'){
+  g.fillStyle='#ecff74';g.beginPath();g.arc(-22,-20,4,0,7);g.arc(20,-12,3,0,7);g.fill();
+ }
+ const emblem={classic:'💗',fire:'🔥',electric:'⚡',galaxy:'✦',gold:'👑',rainbow:'🌈',ice:'❄',shadow:'☾',neon:'✧',crystal:'💎',lava:'🔥',toxic:'☣',candy:'🍬',ocean:'🌊',space:'🪐',bubble:'🫧'}[id];
+ if(emblem){g.textAlign='center';g.textBaseline='middle';g.font=id==='galaxy'||id==='ice'?'bold 21px system-ui':'17px system-ui';g.fillText(emblem,0,-37)}
+ g.restore();
+}
+function drawJelly(){
+ const skin=currentSkin(),c=skin.color;
+ ctx.save();ctx.translate(jelly.x,jelly.y+(!playing?Math.sin(time*.065)*4:0));
+ const vx=playing?Math.max(-.14,Math.min(.15,jelly.vy*.016)):Math.sin(time*.08)*.035;
+ ctx.rotate(playing?Math.max(-.26,Math.min(.38,jelly.vy*.035)):.012*Math.sin(time*.035));ctx.scale(1+vx,1-vx);
+ paintJellyFigure(ctx,skin,time);
+ const w=wallet(name),item=SHOP.find(x=>x.id===w.equipped);
+ if(item){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='22px system-ui';ctx.fillText(({stardust:'✨',crown:'👑',spark:'💫',halo:'🌟'})[item.id],0,-58)}
+ if(playing&&powerState.shield){ctx.strokeStyle='#aef9ff';ctx.lineWidth=3;ctx.shadowBlur=14;ctx.shadowColor='#aef9ff';ctx.beginPath();ctx.arc(0,0,36,0,7);ctx.stroke();ctx.shadowBlur=0}
+ if(playing&&powerState.boost){ctx.fillStyle='#ffef9a';ctx.font='19px system-ui';ctx.fillText('✦',-36,-19)}
+ if(playing&&wild.quality==='ultra'){ctx.globalAlpha=.45+.3*Math.sin(time*.12)**2;ctx.fillStyle='#fffada';ctx.beginPath();ctx.arc(-27,6,2,0,7);ctx.fill();ctx.globalAlpha=1}
+ ctx.restore();
+}
+// Nature graphics upgrade: layered atmospheric landscape and detailed animated grass.
+const landscape={hills:[],blades:[],flowers:[],clouds:[],grassPattern:null,seed:24681357};
+function natureRandom(){landscape.seed=(Math.imul(1664525,landscape.seed)+1013904223)>>>0;return landscape.seed/4294967296}
+function setupNature(){landscape.hills=[];landscape.blades=[];landscape.flowers=[];landscape.clouds=[];for(let i=0;i<14;i++)landscape.clouds.push({x:i*205+natureRandom()*80,y:35+natureRandom()*Math.max(85,H*.3),scale:.5+natureRandom()*.9});for(let i=0;i<Math.ceil(W/7)+30;i++)landscape.blades.push({x:natureRandom()*(W+100),h:8+natureRandom()*24,lean:natureRandom()*2-1,shade:natureRandom(),phase:natureRandom()*6.283});for(let i=0;i<Math.ceil(W/95)+8;i++)landscape.flowers.push({x:natureRandom()*(W+100),y:natureRandom()*48,kind:natureRandom(),phase:natureRandom()*6.283});}
+function rollingHill(base,amplitude,period,shift,color){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,ground);for(let x=0;x<=W+12;x+=12){const world=x+time*shift;const y=base+Math.sin(world/period)*amplitude+Math.sin(world/(period*.41))*(amplitude*.22);ctx.lineTo(x,y)}ctx.lineTo(W,ground);ctx.closePath();ctx.fill()}
+// WILD BLOOM — high fidelity hand-drawn canvas graphics. Pure 2D, no WebGL required.
+const wild={trees:[],particles:[],butterflies:[],pollen:[],initialized:false,toastUntil:0,quality:localStorage.getItem('jj-wild-quality')||'ultra',shake:0,lastJump:0};
+const qualityBtn=$('quality');
+function setQuality(v){wild.quality=v==='eco'?'eco':'ultra';qualityBtn.textContent=wild.quality==='ultra'?'✦ ULTRA':'✧ ECO';$('qualityState').textContent=wild.quality==='ultra'?'ULTRA — πλήρης οπτική ποιότητα':'ECO — πιο ελαφρύ για κινητά';localStorage.setItem('jj-wild-quality',wild.quality)}
+setQuality(wild.quality);
+qualityBtn.onclick=()=>{setQuality(wild.quality==='ultra'?'eco':'ultra');wild.initialized=false};
+function makeWild(){wild.trees=[];wild.pollen=[];wild.butterflies=[];wild.initialized=true;
+  const rnd=()=>natureRandom();
+  for(let i=0;i<24;i++)wild.trees.push({x:i*112+rnd()*70,y:rnd()*18,scale:.5+rnd()*.85,depth:rnd(),bark:rnd(),crown:Math.floor(rnd()*3)});
+  for(let i=0;i<(wild.quality==='ultra'?56:18);i++)wild.pollen.push({x:rnd()*(W+250),y:25+rnd()*Math.max(130,ground-75),r:.7+rnd()*2.2,phase:rnd()*6.283,speed:.1+rnd()*.45});
+  for(let i=0;i<7;i++)wild.butterflies.push({x:rnd()*(W+180),y:50+rnd()*Math.max(140,ground-180),color:i%3,phase:rnd()*6.283,speed:.15+rnd()*.25});
+}
+function orb(x,y,r,colors){const g=ctx.createRadialGradient(x,y,0,x,y,r);for(const [at,col] of colors)g.addColorStop(at,col);ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
+function shapeHill(y,amp,period,shift,c){ctx.beginPath();ctx.moveTo(0,ground+50);for(let x=0;x<=W+20;x+=14){const v=x+time*shift;ctx.lineTo(x,y+Math.sin(v/period)*amp+Math.sin(v/(period*.48)+.7)*amp*.24)}ctx.lineTo(W,ground+50);ctx.closePath();ctx.fillStyle=c;ctx.fill()}
+function pine(x,y,scale,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.moveTo(x-5*scale,y);ctx.lineTo(x-5*scale,y-62*scale);ctx.lineTo(x+5*scale,y-62*scale);ctx.lineTo(x+5*scale,y);ctx.fill();for(let k=0;k<3;k++){let yy=y-(42+k*27)*scale,w=(37-k*7)*scale;ctx.beginPath();ctx.moveTo(x,yy-76*scale);ctx.lineTo(x-w,yy);ctx.quadraticCurveTo(x,yy-10*scale,x+w,yy);ctx.closePath();ctx.fill()}}
+function forestTrees(){for(let i=0;i<wild.trees.length;i++){const t=wild.trees[i],q=(t.x-time*(.16+t.depth*.22)+3000)%(W+350)-175;
+ if(q<-150||q>W+150)continue;
+ const s=t.scale*(t.depth>.5?.92:.72),top=ground-(t.depth>.5?25:85);
+ const col=t.depth>.58?'#326c52':'#5f9a7c';
+ ctx.save();ctx.globalAlpha=.61+t.depth*.19;ctx.fillStyle=t.depth>.58?'#3c7661':'#6ca789';ctx.fillRect(q-4*s,top-102*s,8*s,132*s);
+ ctx.translate(q,top-103*s);ctx.scale(s,s);ctx.fillStyle=col;
+ for(let h=0;h<4;h++){const yy=h*-28;ctx.beginPath();ctx.ellipse(-19+h*2,yy-12,32-h*3,22,0,0,Math.PI*2);ctx.ellipse(15,yy-7,36-h*2,24,0,0,Math.PI*2);ctx.ellipse(1,yy-31,29-h*3,28,0,0,Math.PI*2);ctx.fill()}
+ ctx.restore();}}
+function background(){
+ if(currentWorld().id!=='forest'){realmBackground();return}
+ if(!landscape.blades.length){setupNature();wild.initialized=false}
+ if(!wild.initialized)makeWild();
+ // Cinematic high-altitude sky with peach horizon and natural sunlight.
+ const sky=ctx.createLinearGradient(0,0,0,ground);sky.addColorStop(0,'#4c91b7');sky.addColorStop(.39,'#91c9d0');sky.addColorStop(.74,'#d2e6c0');sky.addColorStop(1,'#f8df9e');ctx.fillStyle=sky;ctx.fillRect(0,0,W,ground+4);
+ const sx=W*.78,sy=Math.max(90,ground*.22);
+ orb(sx,sy,Math.max(180,W*.27),[[0,'#fff4b587'],[.2,'#ffebaa55'],[.52,'#f1e0ba1a'],[1,'#f3dcbb00']]);
+ orb(sx,sy,53,[[0,'#fffdefff'],[.28,'#fff8ddce'],[1,'#fff8df00']]);
+ ctx.fillStyle='#fffde7';ctx.beginPath();ctx.arc(sx,sy,22,0,Math.PI*2);ctx.fill();
+ // A handful of transparent sunbeams create cinematic light shafts.
+ if(wild.quality==='ultra'){ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(sx-8+i*13,sy);ctx.lineTo(sx-360+i*105,ground+80);ctx.lineTo(sx-290+i*122,ground+80);ctx.closePath();ctx.fillStyle='rgba(255,250,214,.037)';ctx.fill()}ctx.restore()}
+ for(const c of landscape.clouds){let x=((c.x-time*.14)%(W+450)+(W+450))%(W+450)-180;ctx.save();ctx.translate(x,c.y);ctx.scale(c.scale,c.scale);ctx.fillStyle='#fffef1a5';ctx.beginPath();ctx.ellipse(-30,8,37,15,0,0,7);ctx.ellipse(0,-2,39,22,0,0,7);ctx.ellipse(32,8,31,14,0,0,7);ctx.fill();ctx.restore()}
+ // Three parallax mountain ridges and layered mist.
+ shapeHill(ground-165,35,160,.075,'#b7c9ac');shapeHill(ground-125,42,114,.12,'#8fb99b');
+ ctx.fillStyle='#ffefdb2c';ctx.fillRect(0,ground-156,W,55);
+ shapeHill(ground-87,36,95,.2,'#6eaa83');
+ forestTrees();
+ shapeHill(ground-39,22,63,.39,'#3c8964');
+ // Dewy meadow, dark rich soil and finely lit blades.
+ const earth=ctx.createLinearGradient(0,ground-20,0,H);earth.addColorStop(0,'#96d56f');earth.addColorStop(.08,'#5ead50');earth.addColorStop(.56,'#277149');earth.addColorStop(1,'#144a3b');ctx.fillStyle=earth;ctx.fillRect(0,ground-5,W,H-ground+8);
+ // far-off ridge and tufts of wild grass at meadow edge
+ const edge=ctx.createLinearGradient(0,ground-10,0,ground+12);edge.addColorStop(0,'#d6ee8a');edge.addColorStop(.42,'#71c75a');edge.addColorStop(1,'#2d7b42');ctx.fillStyle=edge;ctx.fillRect(0,ground-7,W,15);
+ for(const g of landscape.blades){const x=((g.x-time*.78)%(W+100)+(W+100))%(W+100)-50;let sway=Math.sin(time*.027+g.phase)*2.9+g.lean*3.8;ctx.strokeStyle=g.shade>.69?'#bce27a':g.shade>.28?'#65b951':'#337f45';ctx.lineWidth=g.shade>.85?1.8:1.15;ctx.beginPath();ctx.moveTo(x,ground+6);ctx.quadraticCurveTo(x+sway*.26,ground-g.h*.6,x+sway,ground-g.h);ctx.stroke()}
+ for(const f of landscape.flowers){const x=((f.x-time*.84)%(W+100)+(W+100))%(W+100)-50,y=ground+8+f.y,s=Math.sin(time*.035+f.phase)*2;
+ ctx.strokeStyle='#317345';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y+5);ctx.quadraticCurveTo(x+s,y-3,x+s,y-9);ctx.stroke();ctx.fillStyle=f.kind>.5?'#fff4cb':'#f6d4ee';for(let i=0;i<5;i++){const a=i*Math.PI*2/5;ctx.beginPath();ctx.arc(x+s+Math.cos(a)*3,y-9+Math.sin(a)*3,2.3,0,7);ctx.fill()}ctx.fillStyle='#e5ae38';ctx.beginPath();ctx.arc(x+s,y-9,1.9,0,7);ctx.fill()}
+ // Glowing pollen and butterflies, kept subtle over the sky and meadow.
+ for(const p of wild.pollen){const x=((p.x-time*p.speed+W+180)%(W+180)),y=p.y+Math.sin(time*.019+p.phase)*14;ctx.globalAlpha=.3+.32*Math.sin(time*.034+p.phase)**2;ctx.fillStyle='#fff6b0';ctx.beginPath();ctx.arc(x,y,p.r,0,7);ctx.fill()}ctx.globalAlpha=1;
+ if(wild.quality==='ultra')for(const b of wild.butterflies){const x=(b.x-time*b.speed+W+180)%(W+180),y=b.y+Math.sin(time*.025+b.phase)*17;ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(time*.015+b.phase)*.14);const flutter=.25+Math.abs(Math.sin(time*.18+b.phase))*.95;ctx.fillStyle=['#ffde8a','#ffd8ed','#bfeaf6'][b.color];ctx.beginPath();ctx.ellipse(-5*flutter,0,5*flutter,7,-.3,0,7);ctx.ellipse(5*flutter,0,5*flutter,7,.3,0,7);ctx.fill();ctx.fillStyle='#745b4e';ctx.fillRect(-.7,-4,1.4,8);ctx.restore()}
+ // Vignette sells a cinematic picture without changing gameplay.
+ const vign=ctx.createRadialGradient(W*.5,H*.42,Math.min(W,H)*.22,W*.5,H*.42,Math.max(W,H)*.84);vign.addColorStop(0,'#00000000');vign.addColorStop(1,'#052b2c48');ctx.fillStyle=vign;ctx.fillRect(0,0,W,H);
+}
+function emitWild(x,y,n,color,force=1){const total=wild.quality==='ultra'?n:Math.ceil(n*.45);for(let i=0;i<total;i++){const a=Math.random()*Math.PI*2,v=1.3+Math.random()*3.4;wild.particles.push({x,y,vx:Math.cos(a)*v*force,vy:Math.sin(a)*v*force-1,life:22+Math.random()*32,max:54,size:1.5+Math.random()*3,color:color||'#fff5bc',type:Math.random()>.62?'spark':'dot'})}if(wild.particles.length>130)wild.particles.splice(0,wild.particles.length-130)}
+function showWildToast(txt){const el=$('fxToast');el.textContent=txt;el.classList.add('show');wild.toastUntil=Date.now()+900}
+function renderWildFX(dt){for(let i=wild.particles.length-1;i>=0;i--){const p=wild.particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=.045*dt;p.life-=dt;if(p.life<=0){wild.particles.splice(i,1);continue}ctx.globalAlpha=Math.max(0,Math.min(1,p.life/24));ctx.fillStyle=p.color;if(p.type==='spark'){ctx.save();ctx.translate(p.x,p.y);ctx.rotate((54-p.life)*.13);ctx.fillRect(-p.size*.45,-p.size*1.7,p.size*.9,p.size*3.4);ctx.restore()}else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,7);ctx.fill()}}ctx.globalAlpha=1;if(wild.toastUntil&&Date.now()>wild.toastUntil){$('fxToast').classList.remove('show');wild.toastUntil=0}}
+function frame(t){
+ const dt=Math.min((t-last)/16.667||1,2);last=t;time+=dt;
+ ctx.save();if(wild.shake>0){ctx.translate((Math.random()-.5)*wild.shake,(Math.random()-.5)*wild.shake);wild.shake=Math.max(0,wild.shake-0.5*dt)}
+ background();
+ if(playing){
+  tickPowers(dt);const moveDt=dt*(powerState.slow>0?.62:1);
+  musicTimer+=dt;if(musicTimer>22){musicTimer=0;beep(notes[noteIndex++%notes.length],.14,.012,'triangle')}
+  jelly.vy+=.31*moveDt;jelly.y+=jelly.vy*moveDt;spawn+=moveDt;
+  if(spawn>Math.max(66,95-(level()-1)*4)){
+   spawn=0;const gap=gapSize(),minTop=65,maxTop=Math.max(minTop+10,ground-gap-70),top=minTop+Math.random()*(maxTop-minTop);
+   obstacleNumber++;
+   pipes.push({x:W+20,top,gap,passed:false,coin:!room&&obstacleNumber%2===0,coinTaken:false,pickup:!room&&obstacleNumber%4===0?POWER_TYPES[(Math.floor(obstacleNumber/4)-1)%POWER_TYPES.length].id:null,pickupTaken:false,shieldHit:false});
+  }
+ }
+ for(const p of pipes){
+  if(playing)p.x-=speed()*dt*(powerState.slow>0?.62:1);
+  pipe(p.x,p.top,p.gap);
+  if(playing){
+   if(!p.passed&&p.x+68<jelly.x){
+    p.passed=true;score++;missionEvent('points');if(room)sendArenaScore(score,false);
+    scoreText.textContent=score;levelText.textContent='ΕΠΙΠΕΔΟ '+level();emitWild(jelly.x+30,jelly.y,15,'#ffe89d',1.3);
+    if(score%5===0){showWildToast('✦ ΕΠΙΠΕΔΟ '+level()+' ✦');wild.shake=3}beep(760,.1,.05);
+   }
+   handlePickups(p);
+   if(!p.shieldHit&&jelly.x+jelly.r-7>p.x&&jelly.x-jelly.r+7<p.x+68&&(jelly.y-jelly.r+6<p.top||jelly.y+jelly.r-6>p.top+p.gap)){
+    if(saveHit())p.shieldHit=true;else finish();
+   }
+  }
+ }
+ pipes=pipes.filter(p=>p.x>-90);
+ if(playing&&(jelly.y+jelly.r>ground||jelly.y-jelly.r<0)){
+  if(saveHit()){jelly.y=Math.max(jelly.r+5,Math.min(ground-jelly.r-5,jelly.y));jelly.vy=jelly.y>H*.5?-5.9:2.2}else finish();
+ }
+ renderWildFX(dt);drawJelly();ctx.restore();requestAnimationFrame(frame)
+}
+requestAnimationFrame(frame);function begin(){name=safeName(player.value);if(!name){showMenuView('profilePanel');$('profileNotice').textContent='Γράψε πρώτα το όνομά σου για να παίξεις.';player.focus();return}localStorage.setItem('jj-name',name);updateMenuSummary();reset()}start.onclick=begin;canvas.addEventListener('pointerdown',e=>{e.preventDefault();jump()});document.addEventListener('keydown',e=>{if(e.code!=='Space')return;if(playing){e.preventDefault();jump();return}if(!['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement?.tagName)&&!$('homeView').hidden){e.preventDefault();begin()}});soundBtn.onclick=()=>{muted=!muted;localStorage.setItem('jj-muted',muted?'1':'0');updateSoundUI();if(!muted)initAudio()};player.addEventListener('change',()=>{name=safeName(player.value);localStorage.setItem('jj-name',name);bestText.textContent='🏆 Προσωπικό ρεκόρ: '+best();if(!$('skinsPanel').hidden)renderSkins();if(!$('shopPanel').hidden)renderShop();$('coinCount').textContent=wallet(name).coins});bestText.textContent='🏆 Προσωπικό ρεκόρ: '+best();$('coinCount').textContent=wallet(name).coins;function displayScores(rows){scoresEl.replaceChildren();if(!rows.length){scoresEl.textContent='Δεν υπάρχουν ακόμη σκορ.';return}rows.slice(0,10).forEach((r,i)=>{const line=document.createElement('div'),n=document.createElement('span'),s=document.createElement('strong');n.textContent=`${i+1}. ${r.player_name}`;s.textContent=String(r.score);line.append(n,s);scoresEl.append(line)})}function localBoard(){const top=new Map();for(const r of localScores)top.set(r.player_name??r.name,Math.max(top.get(r.player_name??r.name)||0,Number(r.score)||0));return [...top].filter(([name])=>Boolean(name)).map(([player_name,score])=>({player_name,score})).sort((a,b)=>b.score-a.score)}async function api(path,opts={}){const base=cfg.supabaseUrl.replace(/\/$/,'');const res=await fetch(base+'/rest/v1/'+path,{...opts,headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',...(opts.headers||{})}});if(!res.ok)throw Error('HTTP '+res.status);return res.status===204?null:res.json()}async function submitScore(n,s){await api('scores',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({player_name:n,score:s})})}async function renderBoard(){displayScores(localBoard());if(!online){statusEl.textContent='Τοπική κατάταξη: σκορ μόνο από αυτή τη συσκευή. Για φίλους χρειάζεται online σύνδεση.';return}statusEl.textContent='Φόρτωση online κατάταξης…';try{const rows=await api('scores?select=player_name,score&order=score.desc&limit=100');const top=new Map();for(const r of rows)top.set(r.player_name,Math.max(top.get(r.player_name)||0,r.score));displayScores([...top].map(([player_name,score])=>({player_name,score})).sort((a,b)=>b.score-a.score));statusEl.textContent='🌍 Online κατάταξη φίλων'}catch(e){statusEl.textContent='Δεν είναι διαθέσιμη η online κατάταξη. Εμφανίζονται τα τοπικά σκορ.'}}
+// Realtime 1v1: Supabase RPC + 1 second polling (near-live scores), no game-state synchronization.
+let room=null,roomTimer=null,roomBusy=false,lastArenaSend=0,arenaPending=null;
+const roomStatus=$('arenaStatus'),arenaHud=$('arenaHud');
+function arenaCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let out='';const bytes=new Uint8Array(6);crypto.getRandomValues(bytes);for(const v of bytes)out+=chars[v%chars.length];return out}
+function arenaToken(){return [...crypto.getRandomValues(new Uint8Array(24))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function rpc(fn,body){return api('rpc/'+fn,{method:'POST',body:JSON.stringify(body)})}
+function arenaName(){const n=safeName(player.value);if(!n){player.focus();throw Error('Γράψε πρώτα όνομα παίκτη.')}name=n;localStorage.setItem('jj-name',n);return n}
+function setArenaRoom(r){room=r;roomStatus.textContent='Δωμάτιο '+r.code+' — περιμένουμε αντίπαλο…';$('arenaSetup').hidden=true;$('leaveRoom').hidden=false;$('arenaPlay').hidden=true;arenaHud.hidden=false;arenaHud.textContent='⚔️ Δωμάτιο '+r.code;clearInterval(roomTimer);roomTimer=setInterval(pollArena,1000);pollArena()}
+$('createRoom').onclick=async()=>{try{if(!online)throw Error('Χρειάζεται σύνδεση Supabase.');const n=arenaName(),code=arenaCode(),token=arenaToken();$('createRoom').disabled=true;await rpc('jj_create_room',{p_code:code,p_name:n,p_token:token});setArenaRoom({code,token,side:'host',started:false,finished:false,localScore:0,runActive:false})}catch(e){roomStatus.textContent='Αποτυχία: '+e.message}finally{$('createRoom').disabled=false}};
+$('joinRoom').onclick=async()=>{try{if(!online)throw Error('Χρειάζεται σύνδεση Supabase.');const n=arenaName(),code=$('roomCode').value.trim().toUpperCase(),token=arenaToken();if(!/^[A-Z2-9]{6}$/.test(code))throw Error('Γράψε τον 6ψήφιο κωδικό.');$('joinRoom').disabled=true;await rpc('jj_join_room',{p_code:code,p_name:n,p_token:token});setArenaRoom({code,token,side:'guest',started:false,finished:false,localScore:0,runActive:false})}catch(e){roomStatus.textContent='Αποτυχία: '+e.message}finally{$('joinRoom').disabled=false}};
+function leaveArena(){clearInterval(roomTimer);roomTimer=null;room=null;arenaPending=null;$('arenaSetup').hidden=false;$('leaveRoom').hidden=true;$('arenaPlay').hidden=true;arenaHud.hidden=true;roomStatus.textContent='Έφυγες από το δωμάτιο.'}
+$('leaveRoom').onclick=leaveArena;
+async function pollArena(){if(!room||roomBusy)return;roomBusy=true;const r=room;try{const data=await rpc('jj_room_status',{p_code:r.code,p_token:r.token});if(room!==r)return;if(!data)throw Error('Το δωμάτιο δεν βρέθηκε.');r.started=Boolean(data.guest_name);r.finished=Boolean(data.host_done&&data.guest_done);$('arenaPlay').hidden=!r.started||r.finished;const host=data.host_name||'Host',guest=data.guest_name||'Αναμονή';roomStatus.textContent=`🔑 ${r.code} • ${host}: ${data.host_score} — ${guest}: ${data.guest_score}`+(r.started?' • Πατήστε ΠΑΙΞΕ!':' • Στείλε τον κωδικό στον φίλο σου')+(r.finished?' • ΤΕΛΟΣ ΑΓΩΝΑ':'');arenaHud.textContent=`⚔️ ${host} ${data.host_score} : ${data.guest_score} ${guest}`;if(r.finished){const winner=data.host_score===data.guest_score?'Ισοπαλία!':(data.host_score>data.guest_score?host:guest)+' νίκησε!';roomStatus.textContent+=' 🏆 '+winner}}catch(e){roomStatus.textContent='Πρόβλημα σύνδεσης αγώνα: '+e.message}finally{roomBusy=false}}
+function sendArenaScore(s,done){if(!room)return;const r=room;r.localScore=Math.max(r.localScore,s);if(done)r.runActive=false;arenaPending={r,score:r.localScore,done:!!done};const now=Date.now();if(!done&&now-lastArenaSend<450)return;flushArenaScore()}
+async function flushArenaScore(){if(!arenaPending)return;const a=arenaPending;arenaPending=null;lastArenaSend=Date.now();try{await rpc('jj_update_score',{p_code:a.r.code,p_token:a.r.token,p_score:a.score,p_done:a.done})}catch(e){roomStatus.textContent='Δεν ενημερώθηκε το σκορ: '+e.message}}
+function endArenaRun(s){sendArenaScore(s,true);setTimeout(pollArena,650)}
+setInterval(()=>{if(arenaPending)flushArenaScore()},500);
+$('refresh').onclick=()=>togglePanel('board');
+function updateSoundUI(){soundBtn.textContent=muted?'🔇 OFF':'🔊 ON';$('soundState').textContent=muted?'Όλοι οι ήχοι απενεργοποιημένοι':'Ήχοι και μουσική ενεργοί'}
+function updateMenuSummary(){const n=safeName(player.value)||name;const w=wallet(n),p=readProgress(n);$('menuUsername').textContent=n||'Νέος παίκτης';$('menuCoins').textContent=w.coins;$('profileCoinsValue').textContent=w.coins;$('profileBestValue').textContent=n?Math.max(0,...localScores.filter(r=>(r.player_name??r.name)===n).map(r=>Number(r.score)||0)):'0';$('profileSkinValue').textContent=(SKINS.find(s=>s.id===(localStorage.getItem(skinKey(n))||'classic'))||SKINS[0]).label;$('profilePointsValue').textContent=p.points;$('coinCount').textContent=w.coins}
+function savePlayerProfile(){const n=safeName(player.value);if(!n){$('profileNotice').textContent='Συμπλήρωσε ένα όνομα παίκτη.';player.focus();return}name=n;player.value=n;localStorage.setItem('jj-name',n);bestText.textContent='🏆 Προσωπικό ρεκόρ: '+best();$('profileNotice').textContent='✓ Το όνομα αποθηκεύτηκε!';updateMenuSummary()}
+$('settingsButton').onclick=()=>showMenuView('settingsPanel');
+$('profileButton').onclick=()=>showMenuView('profilePanel');
+$('profileQuick').onclick=()=>showMenuView('profilePanel');
+$('saveProfile').onclick=savePlayerProfile;
+$('arenaPlay').onclick=begin;
+for(const btn of document.querySelectorAll('[data-back]'))btn.addEventListener('click',()=>{if(!$('profilePanel').hidden&&safeName(player.value))savePlayerProfile();showMenuView(btn.dataset.back)});
+player.addEventListener('input',()=>{$('profileNotice').textContent='';updateMenuSummary()});
+updateSoundUI();updateMenuSummary();showMenuView('homeView');renderBoard();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
